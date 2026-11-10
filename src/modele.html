@@ -102,6 +102,7 @@ html.fige, html.fige body { overflow: hidden; }
 /* Un tableau large defile dans son cadre : il n'elargit jamais la page (qu'un telephone dezoomerait). */
 #bloc-echelle > *, #bloc-baies > * { min-width: 0; }
 #bloc-baies { display: grid; gap: 8px; }
+.cases-types { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
 #echelle-etat { margin: 0; font-size: .88rem; color: var(--discret); }
 /* L'editeur plein ecran : toujours sombre, la photo d'abord. */
 #editeur { position: fixed; inset: 0; z-index: 20; background: #111; color: #eee; display: grid; grid-template-rows: auto 1fr auto; }
@@ -176,6 +177,14 @@ footer { text-align: center; color: var(--discret); font-size: .78rem; padding: 
         </div>
         <label class="case" id="bloc-barre" hidden><input type="checkbox" id="ch-barre" checked>Barre d’échelle sur l’image enregistrée</label>
         <label class="case"><input type="checkbox" id="ch-ouvertures">Repérer les fenêtres et les portes</label>
+        <div class="cases-types" id="cases-types">
+          <label class="case"><input type="checkbox" id="ch-volets">Volets</label>
+          <label class="case"><input type="checkbox" id="ch-gouttieres">Gouttières</label>
+          <label class="case"><input type="checkbox" id="ch-sol">Sol</label>
+          <label class="case"><input type="checkbox" id="ch-egout">Égout</label>
+          <label class="case"><input type="checkbox" id="ch-pignon">Pignon</label>
+          <label class="case"><input type="checkbox" id="ch-toit">Contour du toit</label>
+        </div>
         <div id="bloc-baies" hidden>
           <p class="discret" id="cotes-aide">Pour les cotes, posez une longueur connue.</p>
           <div id="liste-ouvertures" class="tableau"></div>
