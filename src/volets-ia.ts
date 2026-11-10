@@ -32,17 +32,37 @@ interface Ort {
 /** Une session par modele (cle : adresse du modele). */
 const sessions = new Map<string, Promise<OrtSession>>();
 
-/** Charge le runtime (script du CDN, une fois). */
+/** Sources du runtime, essayees dans l'ordre : meme version (1.24.1), deux CDN. */
+const RUNTIME_SOURCES = [
+  { js: RUNTIME_URL, dossier: RUNTIME_DOSSIER },
+  { js: 'https://unpkg.com/onnxruntime-web@1.24.1/dist/ort.min.js', dossier: 'https://unpkg.com/onnxruntime-web@1.24.1/dist/' },
+];
+let runtimeDossier = RUNTIME_DOSSIER;
+
+/** Charge le runtime (script d'un CDN, une fois ; repli sur le second CDN si le premier echoue). */
 function chargerRuntime(): Promise<Ort> {
   const w = window as unknown as { ort?: Ort };
   if (w.ort) return Promise.resolve(w.ort);
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = RUNTIME_URL;
-    s.onload = () => (w.ort ? resolve(w.ort) : reject(new Error('runtime absent après chargement')));
-    s.onerror = () => reject(new Error('le runtime onnxruntime-web n’a pas pu être chargé (réseau ?)'));
-    document.head.append(s);
-  });
+  const essayer = (i: number): Promise<Ort> => {
+    if (i >= RUNTIME_SOURCES.length) return Promise.reject(new Error('le runtime onnxruntime-web n’a pas pu être chargé (réseau ?)'));
+    const source = RUNTIME_SOURCES[i]!;
+    return new Promise<Ort>((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = source.js;
+      s.onload = () => {
+        if (w.ort) {
+          runtimeDossier = source.dossier;
+          resolve(w.ort);
+        } else reject(new Error('runtime absent après chargement'));
+      };
+      s.onerror = () => {
+        s.remove();
+        reject(new Error('échec du CDN'));
+      };
+      document.head.append(s);
+    }).catch(() => essayer(i + 1));
+  };
+  return essayer(0);
 }
 
 /** Charge un modele et sa session, une fois par adresse. */
@@ -51,7 +71,7 @@ export function chargerDetecteur(url = MODELE_URL): Promise<OrtSession> {
   if (!s) {
     s = (async () => {
       const ort = await chargerRuntime();
-      ort.env.wasm.wasmPaths = RUNTIME_DOSSIER;
+      ort.env.wasm.wasmPaths = runtimeDossier;
       ort.env.wasm.numThreads = 1;
       const rep = await fetch(url);
       if (!rep.ok) throw new Error(`le modèle n’a pas pu être téléchargé (${rep.status})`);
