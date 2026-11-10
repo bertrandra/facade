@@ -12,6 +12,9 @@ export const RUNTIME_DOSSIER = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.2
 export const MODELE_URL = 'https://raw.githubusercontent.com/bertrandra/facade/6d04280512e9fc7b481450eb996172e7bd83b16b/modeles/volets-yolov10n.onnx';
 /** Le modele des fenetres et portes (meme format, deux classes : 0 fenetre, 1 porte). */
 export const FENETRES_URL = 'https://raw.githubusercontent.com/bertrandra/facade/5c5a99181597165c36d2144115cd32d5c94297c5/modeles/fenetres-yolov10n.onnx';
+/** Le modele COCO (80 classes, YOLOv10n d'origine), noms dans l'ordre des indices du modele. */
+export const COCO_URL = 'https://raw.githubusercontent.com/bertrandra/facade/cba5c487f68851658f36b05031ccba32d51f76ea/modeles/coco-yolov10n.onnx';
+export const COCO_NOMS: string[] = ["person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "couch", "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", "remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear", "hair drier", "toothbrush"];
 /** Taille d'entree du modele, et score minimal d'une detection (calé sur le lot de contrôle CMP, voir PROTOCOLE.md). */
 const TAILLE = 640;
 export const SCORE_MIN = 0.30;
@@ -29,17 +32,37 @@ interface Ort {
 /** Une session par modele (cle : adresse du modele). */
 const sessions = new Map<string, Promise<OrtSession>>();
 
-/** Charge le runtime (script du CDN, une fois). */
+/** Sources du runtime, essayees dans l'ordre : meme version (1.24.1), deux CDN. */
+const RUNTIME_SOURCES = [
+  { js: RUNTIME_URL, dossier: RUNTIME_DOSSIER },
+  { js: 'https://unpkg.com/onnxruntime-web@1.24.1/dist/ort.min.js', dossier: 'https://unpkg.com/onnxruntime-web@1.24.1/dist/' },
+];
+let runtimeDossier = RUNTIME_DOSSIER;
+
+/** Charge le runtime (script d'un CDN, une fois ; repli sur le second CDN si le premier echoue). */
 function chargerRuntime(): Promise<Ort> {
   const w = window as unknown as { ort?: Ort };
   if (w.ort) return Promise.resolve(w.ort);
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = RUNTIME_URL;
-    s.onload = () => (w.ort ? resolve(w.ort) : reject(new Error('runtime absent après chargement')));
-    s.onerror = () => reject(new Error('le runtime onnxruntime-web n’a pas pu être chargé (réseau ?)'));
-    document.head.append(s);
-  });
+  const essayer = (i: number): Promise<Ort> => {
+    if (i >= RUNTIME_SOURCES.length) return Promise.reject(new Error('le runtime onnxruntime-web n’a pas pu être chargé (réseau ?)'));
+    const source = RUNTIME_SOURCES[i]!;
+    return new Promise<Ort>((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = source.js;
+      s.onload = () => {
+        if (w.ort) {
+          runtimeDossier = source.dossier;
+          resolve(w.ort);
+        } else reject(new Error('runtime absent après chargement'));
+      };
+      s.onerror = () => {
+        s.remove();
+        reject(new Error('échec du CDN'));
+      };
+      document.head.append(s);
+    }).catch(() => essayer(i + 1));
+  };
+  return essayer(0);
 }
 
 /** Charge un modele et sa session, une fois par adresse. */
@@ -48,7 +71,7 @@ export function chargerDetecteur(url = MODELE_URL): Promise<OrtSession> {
   if (!s) {
     s = (async () => {
       const ort = await chargerRuntime();
-      ort.env.wasm.wasmPaths = RUNTIME_DOSSIER;
+      ort.env.wasm.wasmPaths = runtimeDossier;
       ort.env.wasm.numThreads = 1;
       const rep = await fetch(url);
       if (!rep.ok) throw new Error(`le modèle n’a pas pu être téléchargé (${rep.status})`);
