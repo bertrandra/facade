@@ -1,0 +1,1113 @@
+{
+ "jeu": "photos-volets (fournies par l'auteur)",
+ "note": "Photos fournies par l'auteur du depot, qui en detient les droits. Boites a la main sur grille (environ +/-10-20 px), dans le repere de la photo d'origine.",
+ "images": [
+  {
+   "nom": "u1",
+   "fichier": "banc/volets/photos/u1.jpg",
+   "largeur": 225,
+   "hauteur": 225,
+   "gt": [
+    {
+     "x": 20,
+     "y": 101,
+     "l": 19,
+     "h": 72,
+     "classe": "volet"
+    },
+    {
+     "x": 78,
+     "y": 101,
+     "l": 18,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 135,
+     "y": 101,
+     "l": 19,
+     "h": 69,
+     "classe": "volet"
+    },
+    {
+     "x": 191,
+     "y": 101,
+     "l": 22,
+     "h": 70,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u2",
+   "fichier": "banc/volets/photos/u2.jpg",
+   "largeur": 250,
+   "hauteur": 193,
+   "gt": [
+    {
+     "x": 105,
+     "y": 40,
+     "l": 13,
+     "h": 24,
+     "classe": "volet"
+    },
+    {
+     "x": 138,
+     "y": 40,
+     "l": 12,
+     "h": 24,
+     "classe": "volet"
+    },
+    {
+     "x": 188,
+     "y": 38,
+     "l": 12,
+     "h": 24,
+     "classe": "volet"
+    },
+    {
+     "x": 221,
+     "y": 38,
+     "l": 14,
+     "h": 24,
+     "classe": "volet"
+    },
+    {
+     "x": 2,
+     "y": 85,
+     "l": 9,
+     "h": 27,
+     "classe": "volet"
+    },
+    {
+     "x": 38,
+     "y": 85,
+     "l": 10,
+     "h": 27,
+     "classe": "volet"
+    },
+    {
+     "x": 103,
+     "y": 91,
+     "l": 11,
+     "h": 41,
+     "classe": "volet"
+    },
+    {
+     "x": 137,
+     "y": 92,
+     "l": 12,
+     "h": 40,
+     "classe": "volet"
+    },
+    {
+     "x": 188,
+     "y": 91,
+     "l": 12,
+     "h": 41,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u3",
+   "fichier": "banc/volets/photos/u3.jpg",
+   "largeur": 554,
+   "hauteur": 554,
+   "gt": [
+    {
+     "x": 64,
+     "y": 285,
+     "l": 41,
+     "h": 119,
+     "classe": "volet"
+    },
+    {
+     "x": 175,
+     "y": 284,
+     "l": 33,
+     "h": 118,
+     "classe": "volet"
+    },
+    {
+     "x": 336,
+     "y": 292,
+     "l": 30,
+     "h": 67,
+     "classe": "volet"
+    },
+    {
+     "x": 427,
+     "y": 292,
+     "l": 34,
+     "h": 65,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u4",
+   "fichier": "banc/volets/photos/u4.jpg",
+   "largeur": 480,
+   "hauteur": 639,
+   "gt": [
+    {
+     "x": 257,
+     "y": 228,
+     "l": 24,
+     "h": 53,
+     "classe": "volet"
+    },
+    {
+     "x": 330,
+     "y": 240,
+     "l": 20,
+     "h": 46,
+     "classe": "volet"
+    },
+    {
+     "x": 379,
+     "y": 245,
+     "l": 22,
+     "h": 45,
+     "classe": "volet"
+    },
+    {
+     "x": 437,
+     "y": 252,
+     "l": 18,
+     "h": 43,
+     "classe": "volet"
+    },
+    {
+     "x": 24,
+     "y": 353,
+     "l": 38,
+     "h": 110,
+     "classe": "volet"
+    },
+    {
+     "x": 137,
+     "y": 355,
+     "l": 33,
+     "h": 72,
+     "classe": "volet"
+    },
+    {
+     "x": 247,
+     "y": 355,
+     "l": 31,
+     "h": 91,
+     "classe": "volet"
+    },
+    {
+     "x": 334,
+     "y": 358,
+     "l": 26,
+     "h": 88,
+     "classe": "volet"
+    },
+    {
+     "x": 379,
+     "y": 358,
+     "l": 27,
+     "h": 86,
+     "classe": "volet"
+    },
+    {
+     "x": 449,
+     "y": 360,
+     "l": 21,
+     "h": 79,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u5",
+   "fichier": "banc/volets/photos/u5.jpg",
+   "largeur": 588,
+   "hauteur": 393,
+   "gt": [
+    {
+     "x": 223,
+     "y": 165,
+     "l": 13,
+     "h": 50,
+     "classe": "volet"
+    },
+    {
+     "x": 270,
+     "y": 165,
+     "l": 16,
+     "h": 50,
+     "classe": "volet"
+    },
+    {
+     "x": 306,
+     "y": 165,
+     "l": 14,
+     "h": 50,
+     "classe": "volet"
+    },
+    {
+     "x": 353,
+     "y": 165,
+     "l": 15,
+     "h": 50,
+     "classe": "volet"
+    },
+    {
+     "x": 383,
+     "y": 165,
+     "l": 14,
+     "h": 50,
+     "classe": "volet"
+    },
+    {
+     "x": 427,
+     "y": 165,
+     "l": 15,
+     "h": 50,
+     "classe": "volet"
+    },
+    {
+     "x": 222,
+     "y": 244,
+     "l": 14,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 274,
+     "y": 244,
+     "l": 17,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 303,
+     "y": 244,
+     "l": 19,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 357,
+     "y": 244,
+     "l": 16,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 383,
+     "y": 244,
+     "l": 20,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 434,
+     "y": 244,
+     "l": 16,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 112,
+     "y": 250,
+     "l": 13,
+     "h": 23,
+     "classe": "volet"
+    },
+    {
+     "x": 153,
+     "y": 250,
+     "l": 15,
+     "h": 20,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u6",
+   "fichier": "banc/volets/photos/u6.jpg",
+   "largeur": 520,
+   "hauteur": 384,
+   "gt": [
+    {
+     "x": 221,
+     "y": 81,
+     "l": 16,
+     "h": 49,
+     "classe": "volet"
+    },
+    {
+     "x": 285,
+     "y": 78,
+     "l": 21,
+     "h": 49,
+     "classe": "volet"
+    },
+    {
+     "x": 382,
+     "y": 78,
+     "l": 24,
+     "h": 47,
+     "classe": "volet"
+    },
+    {
+     "x": 452,
+     "y": 78,
+     "l": 26,
+     "h": 47,
+     "classe": "volet"
+    },
+    {
+     "x": 16,
+     "y": 169,
+     "l": 16,
+     "h": 55,
+     "classe": "volet"
+    },
+    {
+     "x": 78,
+     "y": 169,
+     "l": 26,
+     "h": 55,
+     "classe": "volet"
+    },
+    {
+     "x": 216,
+     "y": 182,
+     "l": 21,
+     "h": 78,
+     "classe": "volet"
+    },
+    {
+     "x": 285,
+     "y": 182,
+     "l": 22,
+     "h": 78,
+     "classe": "volet"
+    },
+    {
+     "x": 385,
+     "y": 182,
+     "l": 26,
+     "h": 78,
+     "classe": "volet"
+    },
+    {
+     "x": 458,
+     "y": 182,
+     "l": 26,
+     "h": 78,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u7",
+   "fichier": "banc/volets/photos/u7.jpg",
+   "largeur": 550,
+   "hauteur": 412,
+   "gt": [
+    {
+     "x": 191,
+     "y": 124,
+     "l": 28,
+     "h": 81,
+     "classe": "volet"
+    },
+    {
+     "x": 271,
+     "y": 129,
+     "l": 23,
+     "h": 77,
+     "classe": "volet"
+    },
+    {
+     "x": 302,
+     "y": 132,
+     "l": 22,
+     "h": 74,
+     "classe": "volet"
+    },
+    {
+     "x": 370,
+     "y": 136,
+     "l": 22,
+     "h": 73,
+     "classe": "volet"
+    },
+    {
+     "x": 393,
+     "y": 138,
+     "l": 21,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 455,
+     "y": 142,
+     "l": 19,
+     "h": 68,
+     "classe": "volet"
+    },
+    {
+     "x": 189,
+     "y": 252,
+     "l": 27,
+     "h": 81,
+     "classe": "volet"
+    },
+    {
+     "x": 268,
+     "y": 252,
+     "l": 24,
+     "h": 75,
+     "classe": "volet"
+    },
+    {
+     "x": 391,
+     "y": 250,
+     "l": 23,
+     "h": 69,
+     "classe": "volet"
+    },
+    {
+     "x": 455,
+     "y": 250,
+     "l": 19,
+     "h": 65,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u8",
+   "fichier": "banc/volets/photos/u8.jpg",
+   "largeur": 1200,
+   "hauteur": 800,
+   "gt": [
+    {
+     "x": 336,
+     "y": 378,
+     "l": 24,
+     "h": 84,
+     "classe": "volet"
+    },
+    {
+     "x": 408,
+     "y": 378,
+     "l": 24,
+     "h": 84,
+     "classe": "volet"
+    },
+    {
+     "x": 522,
+     "y": 378,
+     "l": 18,
+     "h": 84,
+     "classe": "volet"
+    },
+    {
+     "x": 594,
+     "y": 378,
+     "l": 24,
+     "h": 84,
+     "classe": "volet"
+    },
+    {
+     "x": 720,
+     "y": 378,
+     "l": 24,
+     "h": 84,
+     "classe": "volet"
+    },
+    {
+     "x": 786,
+     "y": 378,
+     "l": 24,
+     "h": 84,
+     "classe": "volet"
+    },
+    {
+     "x": 300,
+     "y": 502,
+     "l": 42,
+     "h": 90,
+     "classe": "volet"
+    },
+    {
+     "x": 420,
+     "y": 502,
+     "l": 38,
+     "h": 90,
+     "classe": "volet"
+    },
+    {
+     "x": 694,
+     "y": 502,
+     "l": 26,
+     "h": 90,
+     "classe": "volet"
+    },
+    {
+     "x": 802,
+     "y": 502,
+     "l": 38,
+     "h": 90,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u9",
+   "fichier": "banc/volets/photos/u9.jpg",
+   "largeur": 1536,
+   "hauteur": 1152,
+   "source": "polyhabitat.fr (droits confirmés par l'auteur)",
+   "gt": [
+    {
+     "x": 108,
+     "y": 284,
+     "l": 53,
+     "h": 146,
+     "classe": "volet"
+    },
+    {
+     "x": 276,
+     "y": 246,
+     "l": 80,
+     "h": 161,
+     "classe": "volet"
+    },
+    {
+     "x": 919,
+     "y": 69,
+     "l": 118,
+     "h": 231,
+     "classe": "volet"
+    },
+    {
+     "x": 1336,
+     "y": 0,
+     "l": 111,
+     "h": 238,
+     "classe": "volet"
+    },
+    {
+     "x": 69,
+     "y": 630,
+     "l": 72,
+     "h": 276,
+     "classe": "volet"
+    },
+    {
+     "x": 233,
+     "y": 630,
+     "l": 93,
+     "h": 361,
+     "classe": "volet"
+    },
+    {
+     "x": 1044,
+     "y": 607,
+     "l": 151,
+     "h": 530,
+     "classe": "volet"
+    },
+    {
+     "x": 1190,
+     "y": 607,
+     "l": 162,
+     "h": 530,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u10",
+   "fichier": "banc/volets/photos/u10.jpg",
+   "largeur": 1348,
+   "hauteur": 1166,
+   "source": "photo fournie par l'auteur (droits confirmés)",
+   "gt": [
+    {
+     "x": 159,
+     "y": 81,
+     "l": 86,
+     "h": 321,
+     "classe": "volet"
+    },
+    {
+     "x": 253,
+     "y": 84,
+     "l": 91,
+     "h": 318,
+     "classe": "volet"
+    },
+    {
+     "x": 620,
+     "y": 108,
+     "l": 88,
+     "h": 303,
+     "classe": "volet"
+    },
+    {
+     "x": 714,
+     "y": 108,
+     "l": 75,
+     "h": 307,
+     "classe": "volet"
+    },
+    {
+     "x": 1049,
+     "y": 132,
+     "l": 83,
+     "h": 293,
+     "classe": "volet"
+    },
+    {
+     "x": 1135,
+     "y": 135,
+     "l": 69,
+     "h": 290,
+     "classe": "volet"
+    },
+    {
+     "x": 40,
+     "y": 563,
+     "l": 106,
+     "h": 340,
+     "classe": "volet"
+    },
+    {
+     "x": 348,
+     "y": 563,
+     "l": 97,
+     "h": 337,
+     "classe": "volet"
+    },
+    {
+     "x": 519,
+     "y": 566,
+     "l": 90,
+     "h": 465,
+     "classe": "volet"
+    },
+    {
+     "x": 802,
+     "y": 573,
+     "l": 85,
+     "h": 445,
+     "classe": "volet"
+    },
+    {
+     "x": 954,
+     "y": 573,
+     "l": 87,
+     "h": 310,
+     "classe": "volet"
+    },
+    {
+     "x": 1211,
+     "y": 573,
+     "l": 86,
+     "h": 306,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u11",
+   "fichier": "banc/volets/photos/u11.jpg",
+   "largeur": 900,
+   "hauteur": 1353,
+   "source": "photo fournie par l'auteur (droits confirmés)",
+   "gt": [
+    {
+     "x": 90,
+     "y": 176,
+     "l": 90,
+     "h": 274,
+     "classe": "volet"
+    },
+    {
+     "x": 331,
+     "y": 230,
+     "l": 79,
+     "h": 252,
+     "classe": "volet"
+    },
+    {
+     "x": 526,
+     "y": 274,
+     "l": 68,
+     "h": 226,
+     "classe": "volet"
+    },
+    {
+     "x": 709,
+     "y": 310,
+     "l": 54,
+     "h": 216,
+     "classe": "volet"
+    },
+    {
+     "x": 470,
+     "y": 688,
+     "l": 110,
+     "h": 392,
+     "classe": "volet"
+    },
+    {
+     "x": 754,
+     "y": 711,
+     "l": 94,
+     "h": 353,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u12",
+   "fichier": "banc/volets/photos/u12.jpg",
+   "largeur": 1300,
+   "hauteur": 956,
+   "source": "photo fournie par l'auteur (droits confirmes)",
+   "gt": [
+    {
+     "x": 325,
+     "y": 455,
+     "l": 65,
+     "h": 253,
+     "classe": "volet"
+    },
+    {
+     "x": 520,
+     "y": 452,
+     "l": 52,
+     "h": 292,
+     "classe": "volet"
+    },
+    {
+     "x": 572,
+     "y": 448,
+     "l": 78,
+     "h": 300,
+     "classe": "volet"
+    },
+    {
+     "x": 796,
+     "y": 448,
+     "l": 72,
+     "h": 329,
+     "classe": "volet"
+    },
+    {
+     "x": 868,
+     "y": 448,
+     "l": 91,
+     "h": 329,
+     "classe": "volet"
+    },
+    {
+     "x": 1141,
+     "y": 455,
+     "l": 91,
+     "h": 361,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u13",
+   "fichier": "banc/volets/photos/u13.jpg",
+   "largeur": 1300,
+   "hauteur": 956,
+   "source": "photo fournie par l'auteur (droits confirmes)",
+   "gt": [
+    {
+     "x": 260,
+     "y": 84,
+     "l": 98,
+     "h": 196,
+     "classe": "volet"
+    },
+    {
+     "x": 355,
+     "y": 81,
+     "l": 87,
+     "h": 199,
+     "classe": "volet"
+    },
+    {
+     "x": 644,
+     "y": 107,
+     "l": 84,
+     "h": 185,
+     "classe": "volet"
+    },
+    {
+     "x": 728,
+     "y": 107,
+     "l": 75,
+     "h": 185,
+     "classe": "volet"
+    },
+    {
+     "x": 887,
+     "y": 127,
+     "l": 75,
+     "h": 182,
+     "classe": "volet"
+    },
+    {
+     "x": 962,
+     "y": 130,
+     "l": 84,
+     "h": 182,
+     "classe": "volet"
+    },
+    {
+     "x": 1154,
+     "y": 162,
+     "l": 104,
+     "h": 234,
+     "classe": "volet"
+    },
+    {
+     "x": 1258,
+     "y": 162,
+     "l": 42,
+     "h": 241,
+     "classe": "volet"
+    },
+    {
+     "x": 228,
+     "y": 442,
+     "l": 104,
+     "h": 280,
+     "classe": "volet"
+    },
+    {
+     "x": 325,
+     "y": 442,
+     "l": 97,
+     "h": 280,
+     "classe": "volet"
+    },
+    {
+     "x": 650,
+     "y": 455,
+     "l": 101,
+     "h": 270,
+     "classe": "volet"
+    },
+    {
+     "x": 748,
+     "y": 455,
+     "l": 84,
+     "h": 270,
+     "classe": "volet"
+    },
+    {
+     "x": 916,
+     "y": 468,
+     "l": 98,
+     "h": 260,
+     "classe": "volet"
+    },
+    {
+     "x": 1014,
+     "y": 468,
+     "l": 91,
+     "h": 260,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u14",
+   "fichier": "banc/volets/photos/u14.jpg",
+   "largeur": 1280,
+   "hauteur": 800,
+   "source": "photo fournie par l'auteur (droits confirmes)",
+   "gt": [
+    {
+     "x": 218,
+     "y": 0,
+     "l": 44,
+     "h": 125,
+     "classe": "volet"
+    },
+    {
+     "x": 339,
+     "y": 0,
+     "l": 42,
+     "h": 58,
+     "classe": "volet"
+    },
+    {
+     "x": 471,
+     "y": 0,
+     "l": 44,
+     "h": 38,
+     "classe": "volet"
+    },
+    {
+     "x": 218,
+     "y": 269,
+     "l": 44,
+     "h": 304,
+     "classe": "volet"
+    },
+    {
+     "x": 339,
+     "y": 262,
+     "l": 45,
+     "h": 320,
+     "classe": "volet"
+    },
+    {
+     "x": 791,
+     "y": 132,
+     "l": 105,
+     "h": 482,
+     "classe": "volet"
+    },
+    {
+     "x": 1073,
+     "y": 70,
+     "l": 166,
+     "h": 576,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u15",
+   "fichier": "banc/volets/photos/u15.jpg",
+   "largeur": 800,
+   "hauteur": 520,
+   "source": "photo fournie par l'auteur (droits confirmes)",
+   "gt": [
+    {
+     "x": 276,
+     "y": 94,
+     "l": 22,
+     "h": 70,
+     "classe": "volet"
+    },
+    {
+     "x": 334,
+     "y": 94,
+     "l": 18,
+     "h": 70,
+     "classe": "volet"
+    },
+    {
+     "x": 366,
+     "y": 94,
+     "l": 20,
+     "h": 70,
+     "classe": "volet"
+    },
+    {
+     "x": 424,
+     "y": 94,
+     "l": 20,
+     "h": 70,
+     "classe": "volet"
+    },
+    {
+     "x": 460,
+     "y": 94,
+     "l": 20,
+     "h": 70,
+     "classe": "volet"
+    },
+    {
+     "x": 520,
+     "y": 94,
+     "l": 18,
+     "h": 70,
+     "classe": "volet"
+    },
+    {
+     "x": 272,
+     "y": 192,
+     "l": 22,
+     "h": 118,
+     "classe": "volet"
+    },
+    {
+     "x": 334,
+     "y": 192,
+     "l": 22,
+     "h": 118,
+     "classe": "volet"
+    },
+    {
+     "x": 364,
+     "y": 192,
+     "l": 20,
+     "h": 118,
+     "classe": "volet"
+    },
+    {
+     "x": 426,
+     "y": 192,
+     "l": 22,
+     "h": 118,
+     "classe": "volet"
+    },
+    {
+     "x": 460,
+     "y": 192,
+     "l": 20,
+     "h": 118,
+     "classe": "volet"
+    },
+    {
+     "x": 520,
+     "y": 192,
+     "l": 20,
+     "h": 118,
+     "classe": "volet"
+    },
+    {
+     "x": 272,
+     "y": 340,
+     "l": 22,
+     "h": 92,
+     "classe": "volet"
+    },
+    {
+     "x": 334,
+     "y": 340,
+     "l": 22,
+     "h": 92,
+     "classe": "volet"
+    },
+    {
+     "x": 460,
+     "y": 340,
+     "l": 20,
+     "h": 92,
+     "classe": "volet"
+    },
+    {
+     "x": 520,
+     "y": 340,
+     "l": 20,
+     "h": 92,
+     "classe": "volet"
+    }
+   ]
+  }
+ ]
+}

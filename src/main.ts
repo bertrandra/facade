@@ -5,7 +5,12 @@
 import { lireExif, champDepuisFocale35 } from './plan/exif.js';
 import { CHAMP_GRAND_COTE_DEFAUT } from './plan/cadrage.js';
 import { versGris, regionUtile, type Gris, type P2, type Redressement, type Segment, type Source } from './auto.js';
-import { operations, type Analyse, type Baie, type Placement, type ResultatBaies, type ResultatRedressement } from './operations.js';
+import { operations, type Analyse, type Baie, type Placement, type ResultatBaies, type ResultatRedressement, type ResultatVolets, type ResultatGouttieres, type ResultatFormes } from './operations.js';
+import { detecterVoletsIA, detecterYolo, FENETRES_URL, type VoletIA } from './volets-ia.js';
+
+type Volet = ResultatVolets['volets'][number];
+type Gouttiere = ResultatGouttieres['gouttieres'][number];
+type Forme = ResultatFormes['formes'][number];
 import { classer } from './plan/classement.js';
 import { editer } from './editeur.js';
 import * as stockage from './stockage.js';
@@ -615,6 +620,93 @@ let echelleEstimee: number | null = null;
 /** Les baies ont-elles ete corrigees a la main (un nouveau reperage les effacerait) ? */
 let baiesCorrigees = false;
 
+/** Les autres types (volets, gouttieres, forme) : calcules une fois par fusion, dessines selon leurs cases. */
+const CASES_AUTRES = ['ch-volets', 'ch-volets-yolo', 'ch-fenetres-yolo', 'ch-gouttieres', 'ch-sol', 'ch-egout', 'ch-pignon', 'ch-toit'] as const;
+const CASES_FORMES = ['ch-sol', 'ch-egout', 'ch-pignon', 'ch-toit'];
+const CASE_FORME: Record<string, string> = { sol: 'ch-sol', egout: 'ch-egout', pignon: 'ch-pignon', toit: 'ch-toit' };
+const COULEUR_FORME: Record<string, string> = { sol: '#e63946', egout: '#8338ec', pignon: '#06d6a0', toit: '#b5179e' };
+let volets: Volet[] = [];
+/** Volets proposes par le detecteur YOLO (case distincte, resultats separes). */
+let voletsYolo: Volet[] = [];
+/** Fenetres et portes proposees par le modele YOLO (case distincte du reperage des baies). */
+let fenetresYolo: VoletIA[] = [];
+/** Les ouvertures trouvees par le reperage (non corrigees) : le detecteur de volets s'en sert de voisinage. */
+let baiesDetectees: { x: number; y: number; l: number; h: number }[] = [];
+let gouttieres: Gouttiere[] = [];
+let formes: Forme[] = [];
+const autresFaits = new Set<string>();
+const coche = (id: string) => $<HTMLInputElement>(id).checked;
+
+/** Calcule les types dont la case est cochee et qui ne le sont pas encore pour cette fusion, puis redessine. */
+async function reperAutres() {
+  if (!dernier) return;
+  const commun = { sortie: dernier.sortie, vu: dernier.vu, l: dernier.l, h: dernier.h, pxParM: echelle };
+  try {
+    if (coche('ch-volets') && !autresFaits.has('volets')) {
+      volets = (await calcul.appeler<ResultatVolets>('volets', { ...commun, baies: baiesDetectees })).volets;
+      autresFaits.add('volets');
+    }
+    if (coche('ch-volets-yolo') && !autresFaits.has('voletsyolo')) {
+      message('etat-resultat', 'Détecteur YOLO des volets : chargement du modèle (la première fois, environ 10 Mo)…');
+      const trouves = await detecterVoletsIA({ largeur: dernier.l, hauteur: dernier.h, donnees: dernier.sortie });
+      voletsYolo = trouves.map((v) => ({ px: v.px, type: 'plein', paire: false, confiance: v.score }));
+      autresFaits.add('voletsyolo');
+      message('etat-resultat', `${voletsYolo.length} volet(s) proposé(s) par le détecteur YOLO. Vérifiez-les.`, 'info');
+    }
+    if (coche('ch-fenetres-yolo') && !autresFaits.has('fenetresyolo')) {
+      message('etat-resultat', 'Détecteur YOLO des fenêtres et portes : chargement du modèle (la première fois, environ 10 Mo)…');
+      fenetresYolo = await detecterYolo({ largeur: dernier.l, hauteur: dernier.h, donnees: dernier.sortie }, FENETRES_URL);
+      autresFaits.add('fenetresyolo');
+      message('etat-resultat', `${fenetresYolo.length} fenêtre(s) ou porte(s) proposée(s) par le détecteur YOLO. Vérifiez-les.`, 'info');
+    }
+    if (coche('ch-gouttieres') && !autresFaits.has('gouttieres')) {
+      gouttieres = (await calcul.appeler<ResultatGouttieres>('gouttieres', commun)).gouttieres;
+      autresFaits.add('gouttieres');
+    }
+    if (CASES_FORMES.some(coche) && !autresFaits.has('formes')) {
+      formes = (await calcul.appeler<ResultatFormes>('formes', commun)).formes;
+      autresFaits.add('formes');
+    }
+  } catch (e) {
+    erreur(e);
+  }
+  apercu();
+}
+
+/** Volets, gouttieres et formes cochees, sur un canevas a `k` fois la taille du resultat. */
+function dessinerAutres(ctx: CanvasRenderingContext2D, k: number) {
+  const u = Math.max(1.5, Math.min(ctx.canvas.width, ctx.canvas.height) * 0.0025);
+  ctx.save();
+  ctx.lineWidth = u * 1.6;
+  if (coche('ch-volets')) {
+    ctx.strokeStyle = '#00b4d8';
+    for (const v of volets) ctx.strokeRect(v.px.x * k, v.px.y * k, v.px.l * k, v.px.h * k);
+  }
+  if (coche('ch-fenetres-yolo')) {
+    for (const f of fenetresYolo) {
+      ctx.strokeStyle = f.classe === 1 ? '#fb5607' : '#ffbe0b';
+      ctx.strokeRect(f.px.x * k, f.px.y * k, f.px.l * k, f.px.h * k);
+    }
+  }
+  if (coche('ch-volets-yolo')) {
+    ctx.strokeStyle = '#ff006e';
+    for (const v of voletsYolo) ctx.strokeRect(v.px.x * k, v.px.y * k, v.px.l * k, v.px.h * k);
+  }
+  if (coche('ch-gouttieres')) {
+    ctx.strokeStyle = '#90be6d';
+    for (const g of gouttieres) ctx.strokeRect(g.px.x * k, g.px.y * k, g.px.l * k, g.px.h * k);
+  }
+  for (const f of formes) {
+    if (!coche(CASE_FORME[f.type]!)) continue;
+    ctx.strokeStyle = COULEUR_FORME[f.type]!;
+    ctx.lineWidth = u * 2.4;
+    ctx.beginPath();
+    f.points.forEach((q, i) => (i ? ctx.lineTo(q.x * k, q.y * k) : ctx.moveTo(q.x * k, q.y * k)));
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 async function fusionner() {
   if (occupe || !photos.length) return;
   occupe = true;
@@ -680,6 +772,13 @@ async function fusionner() {
     solPx = null;
     echelleEstimee = null;
     baiesCorrigees = false;
+    volets = [];
+    voletsYolo = [];
+    fenetresYolo = [];
+    baiesDetectees = [];
+    gouttieres = [];
+    formes = [];
+    autresFaits.clear();
     const date = new Date();
     const z = (n: number) => String(n).padStart(2, '0');
     dernier = { sortie: rendu.sortie, vu: rendu.vu, l: rendu.l, h: rendu.h, nom: `facade_${date.getFullYear()}${z(date.getMonth() + 1)}${z(date.getDate())}_${z(date.getHours())}${z(date.getMinutes())}` };
@@ -701,6 +800,7 @@ async function fusionner() {
     $('resultat-bloc').hidden = false;
     if ($<HTMLInputElement>('ch-ouvertures').checked) await reperer();
     else majBaies();
+    await reperAutres();
     message('etat-resultat', 'Façade redressée. Vous pouvez l’enregistrer.', 'bon');
     $('resultat-bloc').scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (e) {
@@ -741,6 +841,7 @@ function apercu() {
   const c = $<HTMLCanvasElement>('resultat');
   const k = reduction(c, 1600);
   if (baies.length && $<HTMLInputElement>('ch-ouvertures').checked) dessinerBaies(c.getContext('2d')!, k);
+  dessinerAutres(c.getContext('2d')!, k);
 }
 
 const NOMS_BAIES: Record<string, string> = { fenetre: 'Fenêtre', 'porte-fenetre': 'Porte-fenêtre', porte: 'Porte', garage: 'Porte de garage' };
@@ -796,6 +897,7 @@ async function reperer() {
     // detecteur ne modifie pas ses entrees. A 16 Mpx, une copie de plus pese 77 Mo sur un telephone.
     const r = await calcul.appeler<ResultatBaies>('ouvertures', { sortie: dernier.sortie, vu: dernier.vu, l: dernier.l, h: dernier.h, pxParM: echelle });
     baies = r.baies;
+    baiesDetectees = r.baies.map((b) => ({ x: b.px.x, y: b.px.y, l: b.px.l, h: b.px.h }));
     solPx = r.solPx;
     const estimees = r.baies.filter((b) => b.l > 0).map((b) => b.px.l / b.l).sort((a, b) => a - b);
     echelleEstimee = r.echelleConnue ? null : (estimees[estimees.length >> 1] ?? null);
@@ -981,11 +1083,13 @@ async function deuxPoints(mode: 'echelle' | 'mesure') {
   c.width = c.height = 0;
   if (!res || mode !== 'echelle' || !res.valeur) return;
   echelle = pleine(res.points) / res.valeur;
+  autresFaits.clear();
   journal(`échelle : ${fr(res.valeur, 2)} m = ${fr(pleine(res.points), 0)} px`);
   majEchelle();
   // L'echelle affine le reperage (tailles admises) ; des baies corrigees a la main sont gardees.
   if ($<HTMLInputElement>('ch-ouvertures').checked && !baiesCorrigees) await reperer();
   else majBaies();
+  await reperAutres();
 }
 
 /** La barre d'echelle, dessinee en bas a gauche de l'image enregistree. */
@@ -1023,6 +1127,7 @@ function enFichier(type: 'image/jpeg' | 'image/png'): Promise<File | null> {
   const ctx = c.getContext('2d')!;
   ctx.putImageData(new ImageData(sortie as Uint8ClampedArray<ArrayBuffer>, l, h), 0, 0);
   if (baies.length && $<HTMLInputElement>('ch-ouvertures').checked) dessinerBaies(ctx, 1);
+  dessinerAutres(ctx, 1);
   if (echelle && $<HTMLInputElement>('ch-barre').checked) dessinerBarre(ctx, l, h, echelle);
   const nomFinal = echelle ? `${nom}_${Math.round(echelle)}pxm` : nom;
   return new Promise((r) =>
@@ -1139,6 +1244,7 @@ function demarrer() {
   });
   $('ajouter-baie').addEventListener('click', () => void poserBaie());
   $('reperer-encore').addEventListener('click', () => void reperer());
+  for (const id of CASES_AUTRES) $(id).addEventListener('change', () => void reperAutres());
   $('exporter-cotes').addEventListener('click', () => {
     const f = cotesCsv();
     if (f) void offrir(f);

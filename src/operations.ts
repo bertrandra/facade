@@ -25,8 +25,11 @@ import {
   type Source,
 } from './auto.js';
 import { detecterBaies, type Baie, type ResultatBaies } from './baies.js';
+import { detecterVolets, type ResultatVolets } from './volets.js';
+import { detecterGouttieres, type ResultatGouttieres } from './gouttieres.js';
+import { detecterFormes, type ResultatFormes } from './forme.js';
 
-export type { Baie, ResultatBaies };
+export type { Baie, ResultatBaies, ResultatVolets, ResultatGouttieres, ResultatFormes };
 
 export type Progres = (fraction: number, texte: string) => void;
 const pause = () => new Promise<void>((r) => setTimeout(r, 0));
@@ -135,6 +138,21 @@ export const operations = {
   /** Les baies de la facade redressee (baies.ts) ; l'echelle, si elle est connue, affine les filtres de taille. */
   async ouvertures(e: { sortie: Uint8ClampedArray; vu: Uint8Array; l: number; h: number; pxParM: number | null }): Promise<ResultatBaies> {
     return detecterBaies({ largeur: e.l, hauteur: e.h, donnees: e.sortie }, e.vu, e.pxParM);
+  },
+
+  /** Les volets ; `baies` : les ouvertures trouvees par le code de facade (proximite). */
+  async volets(e: { sortie: Uint8ClampedArray; vu: Uint8Array; l: number; h: number; pxParM: number | null; baies: { x: number; y: number; l: number; h: number }[] }): Promise<ResultatVolets> {
+    return detecterVolets({ largeur: e.l, hauteur: e.h, donnees: e.sortie }, e.vu, e.pxParM, e.baies);
+  },
+
+  /** Les gouttieres (horizontales a l'egout, descentes). */
+  async gouttieres(e: { sortie: Uint8ClampedArray; vu: Uint8Array; l: number; h: number; pxParM: number | null }): Promise<ResultatGouttieres> {
+    return detecterGouttieres({ largeur: e.l, hauteur: e.h, donnees: e.sortie }, e.vu, e.pxParM);
+  },
+
+  /** La forme : sol, egout, pignon, contour du toit. */
+  async formes(e: { sortie: Uint8ClampedArray; vu: Uint8Array; l: number; h: number; pxParM: number | null }): Promise<ResultatFormes> {
+    return detecterFormes({ largeur: e.l, hauteur: e.h, donnees: e.sortie }, e.vu, e.pxParM);
   },
 };
 
