@@ -1,0 +1,354 @@
+{
+ "jeu": "commons-volets (pilote)",
+ "note": "Images non versionnées : téléchargées depuis Wikimedia Commons (licences ci-dessous, attribution requise). Boîtes à la main, environ ±10-20 px, dans le repère de l'image de 1280 px.",
+ "images": [
+  {
+   "nom": "c00",
+   "titre": "File:Window with blue wooden shutters on building façade with blue azulejos, Travessa da Portuguesa 1, Lisbon, Portugal julesvernex2.jpg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Window_with_blue_wooden_shutters_on_building_fa%C3%A7ade_with_blue_azulejos%2C_Travessa_da_Portuguesa_1%2C_Lisbon%2C_Portugal_julesvernex2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   "licence": "CC BY-SA 4.0",
+   "largeur": 1280,
+   "hauteur": 1949,
+   "gt": [
+    {
+     "x": 442,
+     "y": 493,
+     "l": 198,
+     "h": 342,
+     "classe": "volet"
+    },
+    {
+     "x": 676,
+     "y": 493,
+     "l": 207,
+     "h": 342,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "c01",
+   "titre": "File:Apartment house building facade, Esino Lario.jpg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Apartment_house_building_facade%2C_Esino_Lario.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   "licence": "CC BY-SA 3.0",
+   "largeur": 1280,
+   "hauteur": 2813,
+   "gt": [
+    {
+     "x": 582,
+     "y": 448,
+     "l": 41,
+     "h": 307,
+     "classe": "volet"
+    },
+    {
+     "x": 623,
+     "y": 448,
+     "l": 42,
+     "h": 307,
+     "classe": "volet"
+    },
+    {
+     "x": 352,
+     "y": 781,
+     "l": 28,
+     "h": 243,
+     "classe": "volet"
+    },
+    {
+     "x": 380,
+     "y": 781,
+     "l": 27,
+     "h": 243,
+     "classe": "volet"
+    },
+    {
+     "x": 179,
+     "y": 1024,
+     "l": 20,
+     "h": 205,
+     "classe": "volet"
+    },
+    {
+     "x": 200,
+     "y": 1024,
+     "l": 20,
+     "h": 205,
+     "classe": "volet"
+    },
+    {
+     "x": 586,
+     "y": 883,
+     "l": 41,
+     "h": 333,
+     "classe": "volet"
+    },
+    {
+     "x": 627,
+     "y": 883,
+     "l": 38,
+     "h": 333,
+     "classe": "volet"
+    },
+    {
+     "x": 352,
+     "y": 1158,
+     "l": 28,
+     "h": 243,
+     "classe": "volet"
+    },
+    {
+     "x": 380,
+     "y": 1158,
+     "l": 27,
+     "h": 243,
+     "classe": "volet"
+    },
+    {
+     "x": 179,
+     "y": 1344,
+     "l": 20,
+     "h": 262,
+     "classe": "volet"
+    },
+    {
+     "x": 200,
+     "y": 1344,
+     "l": 20,
+     "h": 262,
+     "classe": "volet"
+    },
+    {
+     "x": 550,
+     "y": 1434,
+     "l": 38,
+     "h": 282,
+     "classe": "volet"
+    },
+    {
+     "x": 659,
+     "y": 1350,
+     "l": 51,
+     "h": 314,
+     "classe": "volet"
+    },
+    {
+     "x": 320,
+     "y": 1600,
+     "l": 26,
+     "h": 109,
+     "classe": "volet"
+    },
+    {
+     "x": 397,
+     "y": 1536,
+     "l": 38,
+     "h": 166,
+     "classe": "volet"
+    },
+    {
+     "x": 602,
+     "y": 1907,
+     "l": 38,
+     "h": 320,
+     "classe": "volet"
+    },
+    {
+     "x": 640,
+     "y": 1894,
+     "l": 70,
+     "h": 320,
+     "classe": "volet"
+    },
+    {
+     "x": 1073,
+     "y": 307,
+     "l": 41,
+     "h": 230,
+     "classe": "volet"
+    },
+    {
+     "x": 1114,
+     "y": 307,
+     "l": 45,
+     "h": 230,
+     "classe": "volet"
+    },
+    {
+     "x": 1085,
+     "y": 768,
+     "l": 79,
+     "h": 294,
+     "classe": "volet"
+    },
+    {
+     "x": 1103,
+     "y": 1299,
+     "l": 61,
+     "h": 333,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "c06",
+   "titre": "File:Bitolska kukja 02.JPG",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Bitolska_kukja_02.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   "licence": "CC BY-SA 3.0",
+   "largeur": 1280,
+   "hauteur": 960,
+   "gt": [
+    {
+     "x": 0,
+     "y": 371,
+     "l": 109,
+     "h": 269,
+     "classe": "volet"
+    },
+    {
+     "x": 109,
+     "y": 371,
+     "l": 109,
+     "h": 269,
+     "classe": "volet"
+    },
+    {
+     "x": 192,
+     "y": 378,
+     "l": 64,
+     "h": 262,
+     "classe": "volet"
+    },
+    {
+     "x": 294,
+     "y": 378,
+     "l": 77,
+     "h": 262,
+     "classe": "volet"
+    },
+    {
+     "x": 454,
+     "y": 416,
+     "l": 70,
+     "h": 307,
+     "classe": "volet"
+    },
+    {
+     "x": 525,
+     "y": 416,
+     "l": 70,
+     "h": 307,
+     "classe": "volet"
+    },
+    {
+     "x": 653,
+     "y": 410,
+     "l": 64,
+     "h": 307,
+     "classe": "volet"
+    },
+    {
+     "x": 717,
+     "y": 410,
+     "l": 70,
+     "h": 307,
+     "classe": "volet"
+    },
+    {
+     "x": 864,
+     "y": 352,
+     "l": 96,
+     "h": 211,
+     "classe": "volet"
+    },
+    {
+     "x": 998,
+     "y": 314,
+     "l": 90,
+     "h": 288,
+     "classe": "volet"
+    },
+    {
+     "x": 1088,
+     "y": 314,
+     "l": 96,
+     "h": 288,
+     "classe": "volet"
+    },
+    {
+     "x": 1184,
+     "y": 314,
+     "l": 83,
+     "h": 288,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "c07",
+   "titre": "File:Pontoise (95), Caisse d'Épargne, 1900, 34 rue Alexandre-Prachay.jpg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/Pontoise_%2895%29%2C_Caisse_d%27%C3%89pargne%2C_1900%2C_34_rue_Alexandre-Prachay.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   "licence": "CC BY-SA 2.0 fr",
+   "largeur": 1280,
+   "hauteur": 1707,
+   "gt": [
+    {
+     "x": 969,
+     "y": 717,
+     "l": 55,
+     "h": 224,
+     "classe": "volet"
+    },
+    {
+     "x": 1024,
+     "y": 717,
+     "l": 51,
+     "h": 224,
+     "classe": "volet"
+    },
+    {
+     "x": 1152,
+     "y": 666,
+     "l": 58,
+     "h": 230,
+     "classe": "volet"
+    },
+    {
+     "x": 1210,
+     "y": 666,
+     "l": 58,
+     "h": 230,
+     "classe": "volet"
+    },
+    {
+     "x": 975,
+     "y": 1050,
+     "l": 55,
+     "h": 224,
+     "classe": "volet"
+    },
+    {
+     "x": 1030,
+     "y": 1050,
+     "l": 51,
+     "h": 224,
+     "classe": "volet"
+    },
+    {
+     "x": 1158,
+     "y": 1024,
+     "l": 58,
+     "h": 243,
+     "classe": "volet"
+    },
+    {
+     "x": 1216,
+     "y": 1024,
+     "l": 64,
+     "h": 243,
+     "classe": "volet"
+    }
+   ]
+  }
+ ]
+}

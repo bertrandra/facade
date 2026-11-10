@@ -105,3 +105,20 @@ reste le seul juge intact.
   `blind;screen` (store de fenêtre) et `awning;sunshade;sunblind` (banne). Aucune classe volet extérieur.
 - **RobotCar Facade, ECP, CFP** : pas de classe volet (voir les résumés des jeux).
 - **Photos de la maison** : hors dépôt ; il faut les fournir pour les annoter.
+
+### Lot pilote Wikimedia Commons (annoté à la main, licences libres)
+
+Fichier : `banc/volets/annotations/commons-volets.json` (44 volets sur 4 images, avec titre, URL et
+licence de chaque photo). Les images ne sont pas dans le dépôt : elles se téléchargent depuis Commons.
+
+| Image | Licence | Volets |
+|---|---|---|
+| Lisbonne, fenêtre à volets bleus | CC BY-SA 4.0 | 2 |
+| Esino Lario, immeuble | CC BY-SA 3.0 | 22 |
+| Bitolska kukja (balcon) | CC BY-SA 3.0 | 12 |
+| Pontoise, immeuble voisin | CC BY-SA 2.0 fr | 8 |
+
+Mesure (une seule, seuil 0,80) : **0 détection juste sur les 44 volets** (note 0,000). Le détecteur
+ne trouve rien sur ces photos ; cela confirme que ses réglages ne sont pas transférables hors CMP. Le
+lot est trop petit (4 images) pour servir de contrôle ; il sert d'avertissement. Temps : 1,2 à 2 s
+par image, au-dessus du budget du banc (le code de façade y pèse).
