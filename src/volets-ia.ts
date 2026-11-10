@@ -13,7 +13,7 @@ export const MODELE_URL = 'https://raw.githubusercontent.com/bertrandra/facade/6
 /** Le modele des fenetres et portes (meme format, deux classes : 0 fenetre, 1 porte). */
 export const FENETRES_URL = 'https://raw.githubusercontent.com/bertrandra/facade/5c5a99181597165c36d2144115cd32d5c94297c5/modeles/fenetres-yolov10n.onnx';
 /** Le modele COCO (80 classes, YOLOv10n d'origine), noms dans l'ordre des indices du modele. */
-export const COCO_URL = 'https://raw.githubusercontent.com/bertrandra/facade/claude/intelligent-bohr-pozlb4/modeles/coco-yolov10n.onnx';
+export const COCO_URL = 'https://raw.githubusercontent.com/bertrandra/facade/cba5c487f68851658f36b05031ccba32d51f76ea/modeles/coco-yolov10n.onnx';
 export const COCO_NOMS: string[] = ["person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "couch", "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", "remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear", "hair drier", "toothbrush"];
 /** Taille d'entree du modele, et score minimal d'une detection (calé sur le lot de contrôle CMP, voir PROTOCOLE.md). */
 const TAILLE = 640;
