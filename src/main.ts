@@ -965,20 +965,62 @@ function resituerSol() {
  */
 function fusionnerOuvertures(calcul: Baie[], yolo: VoletIA[]): Baie[] {
   const s = echelle ?? echelleEstimee ?? dernier!.l / 12;
-  const iou = (a: Baie['px'], b: { x: number; y: number; l: number; h: number }) => {
-    const ix = Math.max(0, Math.min(a.x + a.l, b.x + b.l) - Math.max(a.x, b.x));
-    const iy = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
-    const i = ix * iy;
+  type Bo = { x: number; y: number; l: number; h: number };
+  const inter = (a: Bo, b: Bo) => Math.max(0, Math.min(a.x + a.l, b.x + b.l) - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+  const iou = (a: Bo, b: Bo) => {
+    const i = inter(a, b);
     return i / (a.l * a.h + b.l * b.h - i || 1);
   };
   const liste: Baie[] = calcul.map((b) => ({ ...b, px: { ...b.px } }));
+  // 1. Une meme ouverture vue par les deux : fusion en une seule boite (hors-tout), qui recupere
+  //    ce que l'un des deux voit de plus (une imposte, un bas de porte). Sinon, deux ouvertures.
   for (const y of yolo) {
-    if (liste.some((b) => iou(b.px, y.px) >= 0.4)) continue;
+    let meilleur: Baie | null = null;
+    let score = 0;
+    for (const b of liste) {
+      const v = iou(b.px, y.px);
+      if (v > score) ((score = v), (meilleur = b));
+    }
+    if (meilleur && score >= 0.4) {
+      const m = meilleur as Baie;
+      m.px = {
+        x: Math.min(m.px.x, y.px.x),
+        y: Math.min(m.px.y, y.px.y),
+        l: Math.max(m.px.x + m.px.l, y.px.x + y.px.l) - Math.min(m.px.x, y.px.x),
+        h: Math.max(m.px.y + m.px.h, y.px.y + y.px.h) - Math.min(m.px.y, y.px.y),
+      };
+      continue;
+    }
+    // Recouvrement partiel avec une baie du calcul, qui contient l'essentiel de la detection : meme ouverture.
+    const contenu = liste.find((b) => inter(b.px, y.px) / Math.min(b.px.l * b.px.h, y.px.l * y.px.h || 1) >= 0.6);
+    if (contenu) {
+      contenu.px = {
+        x: Math.min(contenu.px.x, y.px.x),
+        y: Math.min(contenu.px.y, y.px.y),
+        l: Math.max(contenu.px.x + contenu.px.l, y.px.x + y.px.l) - Math.min(contenu.px.x, y.px.x),
+        h: Math.max(contenu.px.y + contenu.px.h, y.px.y + y.px.h) - Math.min(contenu.px.y, y.px.y),
+      };
+      continue;
+    }
     const type: Baie['type'] = y.classe === 1 ? 'porte' : 'fenetre';
-    liste.push({ type, x: y.px.x / s, y: 0, l: y.px.l / s, h: y.px.h / s, carreaux: 1, px: { x: y.px.x, y: y.px.y, l: y.px.l, h: y.px.h } });
+    liste.push({ type, x: y.px.x / s, y: 0, l: y.px.l / s, h: y.px.h / s, carreaux: 1, px: { ...y.px } });
   }
-  for (const b of liste) b.px = { x: Math.round(b.px.x), y: Math.round(b.px.y), l: Math.round(b.px.l), h: Math.round(b.px.h) };
   const hMed = [...liste.map((b) => b.px.h)].sort((a, b) => a - b)[liste.length >> 1] ?? 1;
+  // 2. Contexte : les fenetres d'une meme rangee (recouvrement vertical) partagent leur haut et leur bas.
+  const fenetres = liste.filter((b) => b.type === 'fenetre');
+  for (const b of fenetres) {
+    const rangee = fenetres.filter((c) => Math.abs(c.px.y + c.px.h / 2 - (b.px.y + b.px.h / 2)) < 0.5 * hMed);
+    if (rangee.length < 2) continue;
+    const haut = [...rangee.map((c) => c.px.y)].sort((p, q) => p - q)[rangee.length >> 1]!;
+    const bas = [...rangee.map((c) => c.px.y + c.px.h)].sort((p, q) => p - q)[rangee.length >> 1]!;
+    for (const c of rangee) {
+      if (Math.abs(c.px.y - haut) < 0.06 * hMed && Math.abs(c.px.y + c.px.h - bas) < 0.06 * hMed) {
+        c.px = { ...c.px, y: haut, h: bas - haut };
+      }
+    }
+  }
+  // 3. Normalisation : entiers, rangs du bas vers le haut, de gauche a droite.
+  for (const b of liste) b.px = { x: Math.round(b.px.x), y: Math.round(b.px.y), l: Math.round(b.px.l), h: Math.round(b.px.h) };
   const rang = (b: Baie) => Math.round((b.px.y + b.px.h) / (0.5 * hMed));
   return liste.sort((a, b) => rang(b) - rang(a) || a.px.x - b.px.x);
 }
