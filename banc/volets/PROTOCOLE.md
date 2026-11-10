@@ -122,3 +122,18 @@ Mesure (une seule, seuil 0,80) : **0 détection juste sur les 44 volets** (note 
 ne trouve rien sur ces photos ; cela confirme que ses réglages ne sont pas transférables hors CMP. Le
 lot est trop petit (4 images) pour servir de contrôle ; il sert d'avertissement. Temps : 1,2 à 2 s
 par image, au-dessus du budget du banc (le code de façade y pèse).
+
+
+### Lot Commons complété : 8 images, 96 volets (une seule mesure)
+
+Ajouts (même méthode, boîtes à la main sur grille, échelle relue sur la largeur réelle du fichier) :
+Riga (domaine public), Amiens (CC BY-SA 3.0), Barcelone (CC0), hôpital (CC BY-SA 2.0 fr).
+Trois autres candidats (Estambul, Marseille, Roussillon) ont renvoyé des erreurs de débit de Wikimedia ;
+ils sont à reprendre plus tard.
+
+Mesure (seuil 0,80) : **0 volet juste sur 96**. Une seule image produit des détections (3, toutes
+fausses, sur la maison de Riga). Les notes par image sont à 0 ; la note globale est aussi à 0 parce que
+le groupe `commons` n'a pas de poids dans la notation globale (0,55 maison, 0,35 cmp, 0,10 synthétique).
+
+Conclusion : le détecteur ne se transfère pas hors du jeu CMP. Il ne faut pas s'appuyer sur ses cases
+« Volets » tant qu'il n'a pas été refait sur des données plus variées.

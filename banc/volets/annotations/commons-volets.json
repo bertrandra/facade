@@ -1,6 +1,6 @@
 {
- "jeu": "commons-volets (pilote)",
- "note": "Images non versionnées : téléchargées depuis Wikimedia Commons (licences ci-dessous, attribution requise). Boîtes à la main, environ ±10-20 px, dans le repère de l'image de 1280 px.",
+ "jeu": "commons-volets (pilote, 8 images)",
+ "note": "Images non versionnees : Wikimedia Commons, licences ci-dessous, attribution requise. Boites a la main (environ +/-10-20 px), dans le repere de l'image telechargee ; les feuilles non annotees comptent comme manquees.",
  "images": [
   {
    "nom": "c00",
@@ -346,6 +346,410 @@
      "y": 1024,
      "l": 64,
      "h": 243,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "d00",
+   "titre": "File:Wooden house (window shutters), Riga.jpg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Wooden_house_%28window_shutters%29%2C_Riga.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   "licence": "Public domain",
+   "largeur": 1280,
+   "hauteur": 1130,
+   "gt": [
+    {
+     "x": 320,
+     "y": 256,
+     "l": 198,
+     "h": 653,
+     "classe": "volet"
+    },
+    {
+     "x": 531,
+     "y": 256,
+     "l": 192,
+     "h": 653,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "d02",
+   "titre": "File:Amiens Hotel Forceville facade.jpg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Amiens_Hotel_Forceville_facade.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   "licence": "CC BY-SA 3.0",
+   "largeur": 1280,
+   "hauteur": 811,
+   "gt": [
+    {
+     "x": 358,
+     "y": 326,
+     "l": 39,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 461,
+     "y": 326,
+     "l": 38,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 570,
+     "y": 326,
+     "l": 38,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 678,
+     "y": 326,
+     "l": 39,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 787,
+     "y": 326,
+     "l": 39,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 890,
+     "y": 326,
+     "l": 38,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 986,
+     "y": 326,
+     "l": 38,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 1024,
+     "y": 326,
+     "l": 38,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 1094,
+     "y": 333,
+     "l": 32,
+     "h": 141,
+     "classe": "volet"
+    },
+    {
+     "x": 1190,
+     "y": 333,
+     "l": 39,
+     "h": 141,
+     "classe": "volet"
+    },
+    {
+     "x": 352,
+     "y": 576,
+     "l": 32,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 461,
+     "y": 576,
+     "l": 38,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 794,
+     "y": 570,
+     "l": 38,
+     "h": 153,
+     "classe": "volet"
+    },
+    {
+     "x": 896,
+     "y": 570,
+     "l": 32,
+     "h": 153,
+     "classe": "volet"
+    },
+    {
+     "x": 979,
+     "y": 563,
+     "l": 39,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 1069,
+     "y": 563,
+     "l": 38,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 1114,
+     "y": 563,
+     "l": 38,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 1210,
+     "y": 563,
+     "l": 38,
+     "h": 147,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "d04",
+   "titre": "File:Barcelona 003.jpg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/0e/Barcelona_003.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   "licence": "CC0",
+   "largeur": 1280,
+   "hauteur": 1707,
+   "gt": [
+    {
+     "x": 269,
+     "y": 486,
+     "l": 138,
+     "h": 192,
+     "classe": "volet"
+    },
+    {
+     "x": 527,
+     "y": 416,
+     "l": 23,
+     "h": 262,
+     "classe": "volet"
+    },
+    {
+     "x": 582,
+     "y": 339,
+     "l": 94,
+     "h": 362,
+     "classe": "volet"
+    },
+    {
+     "x": 714,
+     "y": 335,
+     "l": 146,
+     "h": 366,
+     "classe": "volet"
+    },
+    {
+     "x": 893,
+     "y": 390,
+     "l": 70,
+     "h": 320,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "d05",
+   "titre": "File:Ancien hôpital 13.05.2011.jpg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Ancien_h%C3%B4pital_13.05.2011.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   "licence": "CC BY-SA 2.0 fr",
+   "largeur": 1280,
+   "hauteur": 960,
+   "gt": [
+    {
+     "x": 19,
+     "y": 352,
+     "l": 39,
+     "h": 141,
+     "classe": "volet"
+    },
+    {
+     "x": 64,
+     "y": 352,
+     "l": 32,
+     "h": 141,
+     "classe": "volet"
+    },
+    {
+     "x": 151,
+     "y": 352,
+     "l": 41,
+     "h": 141,
+     "classe": "volet"
+    },
+    {
+     "x": 230,
+     "y": 346,
+     "l": 39,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 266,
+     "y": 346,
+     "l": 35,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 358,
+     "y": 333,
+     "l": 32,
+     "h": 141,
+     "classe": "volet"
+    },
+    {
+     "x": 461,
+     "y": 326,
+     "l": 38,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 576,
+     "y": 326,
+     "l": 38,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 676,
+     "y": 326,
+     "l": 38,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 787,
+     "y": 326,
+     "l": 39,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 890,
+     "y": 326,
+     "l": 38,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 986,
+     "y": 326,
+     "l": 38,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 1024,
+     "y": 326,
+     "l": 38,
+     "h": 148,
+     "classe": "volet"
+    },
+    {
+     "x": 1094,
+     "y": 333,
+     "l": 32,
+     "h": 141,
+     "classe": "volet"
+    },
+    {
+     "x": 1190,
+     "y": 333,
+     "l": 39,
+     "h": 141,
+     "classe": "volet"
+    },
+    {
+     "x": 6,
+     "y": 576,
+     "l": 32,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 38,
+     "y": 576,
+     "l": 39,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 147,
+     "y": 576,
+     "l": 39,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 288,
+     "y": 576,
+     "l": 32,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 356,
+     "y": 576,
+     "l": 28,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 461,
+     "y": 576,
+     "l": 38,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 794,
+     "y": 570,
+     "l": 38,
+     "h": 153,
+     "classe": "volet"
+    },
+    {
+     "x": 896,
+     "y": 570,
+     "l": 32,
+     "h": 153,
+     "classe": "volet"
+    },
+    {
+     "x": 979,
+     "y": 563,
+     "l": 39,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 1073,
+     "y": 563,
+     "l": 34,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 1114,
+     "y": 563,
+     "l": 32,
+     "h": 147,
+     "classe": "volet"
+    },
+    {
+     "x": 1210,
+     "y": 563,
+     "l": 38,
+     "h": 147,
      "classe": "volet"
     }
    ]
