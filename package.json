@@ -1,0 +1,17 @@
+{
+  "name": "facade",
+  "version": "0.1.0",
+  "private": true,
+  "description": "facade.html : façade redressée et ouvertures repérées, une page autonome pour téléphone",
+  "type": "module",
+  "scripts": {
+    "construire": "node construire.mjs",
+    "verifier": "node construire.mjs --verifier",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.2"
+  }
+}
