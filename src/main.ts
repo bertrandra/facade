@@ -148,21 +148,63 @@ const calcul = (() => {
   return { appeler, arrierePlan: () => !!worker };
 })();
 
-/** Ouvre une photo. Le delai garde la page de rester muette si le decodage ne repond jamais. */
+/** Decodeur HEIC (heic2any 0.0.4, CDN), charge seulement si le navigateur ne lit pas une photo. */
+const HEIC_URL = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+let heicChargement: Promise<(o: { blob: Blob; toType: string; quality?: number }) => Promise<Blob | Blob[]>> | null = null;
+function chargerHeic() {
+  if (!heicChargement) {
+    heicChargement = new Promise((ok, ko) => {
+      const s = document.createElement('script');
+      s.src = HEIC_URL;
+      s.onload = () => {
+        const h = (window as unknown as { heic2any?: (o: { blob: Blob; toType: string; quality?: number }) => Promise<Blob | Blob[]> }).heic2any;
+        if (h) ok(h);
+        else ko(new Error('décodeur HEIC absent après chargement'));
+      };
+      s.onerror = () => ko(new Error('décodeur HEIC indisponible (réseau ?)'));
+      document.head.append(s);
+    });
+    heicChargement.catch(() => (heicChargement = null));
+  }
+  return heicChargement;
+}
+
+/** Ouvre une photo. Si le navigateur ne la lit pas, on tente la conversion HEIC (photo d'iPhone). Le delai garde la page de rester muette. */
 function decoder(f: File, url = URL.createObjectURL(f)): Promise<{ img: HTMLImageElement; url: string }> {
   return new Promise((ok, ko) => {
     const img = new Image();
     let fini = false;
+    let essaiHeic = false;
+    let urlFinal = url;
+    let minuterie: ReturnType<typeof setTimeout>;
     const finir = (e?: Error) => {
       if (fini) return;
       fini = true;
       clearTimeout(minuterie);
       if (e) ko(e);
-      else ok({ img, url });
+      else ok({ img, url: urlFinal });
     };
-    const minuterie = setTimeout(() => finir(new Error(`la photo « ${f.name} » ne s’ouvre pas (délai dépassé)`)), 30_000);
+    const delai = (ms: number) => {
+      clearTimeout(minuterie);
+      minuterie = setTimeout(() => finir(new Error(`la photo « ${f.name} » ne s’ouvre pas (délai dépassé)`)), ms);
+    };
+    const echec = () => finir(new Error(`« ${f.name} » n’a pas pu être lue (format HEIC ? réglez Réglages › Appareil photo › Formats sur « Le plus compatible »)`));
+    delai(30_000);
     img.onload = () => (img.naturalWidth ? finir() : finir(new Error(`la photo « ${f.name} » est vide`)));
-    img.onerror = () => finir(new Error(`« ${f.name} » n’a pas pu être lue (format HEIC ? réglez Réglages › Appareil photo › Formats sur « Le plus compatible »)`));
+    img.onerror = () => {
+      if (essaiHeic) return echec();
+      essaiHeic = true;
+      delai(120_000);
+      chargerHeic()
+        .then((convertir) => convertir({ blob: f, toType: 'image/jpeg', quality: 0.92 }))
+        .then((r) => {
+          const jpeg = Array.isArray(r) ? r[0]! : r;
+          URL.revokeObjectURL(urlFinal);
+          urlFinal = URL.createObjectURL(jpeg);
+          img.src = urlFinal;
+        })
+        .catch(() => echec());
+    };
     img.src = url;
   });
 }
