@@ -201,3 +201,19 @@ autres plis ; les photos mesurées ne servent jamais à leur propre entraînemen
 Comparé à la mesure sans photos à l'entraînement (29 / 140 au seuil 0,80) : **gain négligeable (+3)**.
 Le modèle linéaire sur ces 20 caractéristiques plafonne autour de 21–23 % de rappel. Le seuil reste
 très sensible (de 4 % à 23 % de rappel entre 0,7 et 0,8).
+
+### Détecteur YOLOv10n (Ultralytics 8.4, CPU) : première version
+
+Jeu : entraînement = CMP de mise au point (40 images) + photos des plis 0 et 1 (10 photos) ;
+validation (arrêt anticipé) = CMP de contrôle (40) ; test = photos du pli 2 (5) + CMP final (40).
+Réserve de 25 images CMP : intacte. Poids initiaux : YOLOv10n COCO.
+
+| Mesure | mAP50 | mAP50-95 | Précision | Rappel |
+|---|---|---|---|---|
+| Validation (CMP contrôle, 685 volets) | 0,562 | 0,333 | 0,708 | 0,467 |
+| Test (CMP final + photos pli 2, 901 volets) | 0,774 | 0,477 | 0,792 | 0,682 |
+| Photos du pli 2 seules (5 photos, 44 volets) | 0,926 | 0,610 | 1,000 | 0,840 |
+
+Export ONNX : 9,4 Mo, entrée `[1,3,640,640]`, sortie `[1,300,6]` (sans NMS).
+Le petit échantillon de photos (5) rend le chiffre 0,93 très incertain.
+Les poids ne sont pas commités tant que la licence des données CMP n'est pas vérifiée.
