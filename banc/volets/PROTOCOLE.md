@@ -167,3 +167,8 @@ Lot total : 11 photos, 97 volets. Les boîtes ont été vérifiées sur l'image 
 
 6 volets, lot total 12 photos et 103 volets. Photo de stock (filigrane visible) : droits confirmés par l'auteur.
 Boîtes vérifiées sur l'image ; les feuilles partiellement cachées par les pots de fleurs ne sont pas toutes annotées.
+
+### Photos u13, u14, u15 (droits confirmés par l'auteur)
+
+u13 : façade à colombages (banque d'images, filigrane) ; u14 : maison aux volets verts ; u15 : façade d'angle.
+Les boîtes de u15 ont été vérifiées sur l'image. Lot total : 15 photos, 140 volets.
