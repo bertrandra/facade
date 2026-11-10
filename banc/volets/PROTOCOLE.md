@@ -162,3 +162,8 @@ confirmés par l'auteur du dépôt.
 ### Deux photos supplémentaires (u10, u11 : 18 volets), droits confirmés par l'auteur
 
 Lot total : 11 photos, 97 volets. Les boîtes ont été vérifiées sur l'image pour u10.
+
+### Photo u12 (volets violets), droits confirmés par l'auteur
+
+6 volets, lot total 12 photos et 103 volets. Photo de stock (filigrane visible) : droits confirmés par l'auteur.
+Boîtes vérifiées sur l'image ; les feuilles partiellement cachées par les pots de fleurs ne sont pas toutes annotées.

@@ -771,6 +771,57 @@
      "classe": "volet"
     }
    ]
+  },
+  {
+   "nom": "u12",
+   "fichier": "banc/volets/photos/u12.jpg",
+   "largeur": 1300,
+   "hauteur": 956,
+   "source": "photo fournie par l'auteur (droits confirmes)",
+   "gt": [
+    {
+     "x": 325,
+     "y": 455,
+     "l": 65,
+     "h": 253,
+     "classe": "volet"
+    },
+    {
+     "x": 520,
+     "y": 452,
+     "l": 52,
+     "h": 292,
+     "classe": "volet"
+    },
+    {
+     "x": 572,
+     "y": 448,
+     "l": 78,
+     "h": 300,
+     "classe": "volet"
+    },
+    {
+     "x": 796,
+     "y": 448,
+     "l": 72,
+     "h": 329,
+     "classe": "volet"
+    },
+    {
+     "x": 868,
+     "y": 448,
+     "l": 91,
+     "h": 329,
+     "classe": "volet"
+    },
+    {
+     "x": 1141,
+     "y": 455,
+     "l": 91,
+     "h": 361,
+     "classe": "volet"
+    }
+   ]
   }
  ]
 }
