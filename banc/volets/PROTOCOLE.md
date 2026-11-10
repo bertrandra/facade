@@ -217,3 +217,17 @@ Réserve de 25 images CMP : intacte. Poids initiaux : YOLOv10n COCO.
 Export ONNX : 9,4 Mo, entrée `[1,3,640,640]`, sortie `[1,300,6]` (sans NMS).
 Le petit échantillon de photos (5) rend le chiffre 0,93 très incertain.
 Les poids ne sont pas commités tant que la licence des données CMP n'est pas vérifiée.
+
+### Calage du seuil du détecteur YOLO (lot de contrôle CMP seulement)
+
+`banc/volets/yolo_seuil.py`, appariement glouton à IoU ≥ 0,5, sur les 40 images de contrôle (685 volets) :
+
+| Seuil | Précision | Rappel | F1 |
+|---|---|---|---|
+| 0,25 | 0,607 | 0,555 | 0,579 |
+| 0,30 | 0,641 | 0,537 | **0,584** |
+| 0,40 | 0,703 | 0,483 | 0,580 |
+| 0,50 | 0,777 | 0,438 | 0,550 |
+
+Seuil retenu : **0,30** (F1 le plus haut, plateau entre 0,25 et 0,40). Le lot de test et la réserve
+n'ont pas servi à ce choix.

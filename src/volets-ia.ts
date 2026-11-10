@@ -10,9 +10,9 @@ import type { Image } from './auto.js';
 export const RUNTIME_URL = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.1/dist/ort.min.js';
 export const RUNTIME_DOSSIER = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.1/dist/';
 export const MODELE_URL = 'https://raw.githubusercontent.com/bertrandra/facade/claude/intelligent-bohr-pozlb4/modeles/volets-yolov10n.onnx';
-/** Taille d'entree du modele, et score minimal d'une detection. */
+/** Taille d'entree du modele, et score minimal d'une detection (calé sur le lot de contrôle CMP, voir PROTOCOLE.md). */
 const TAILLE = 640;
-export const SCORE_MIN = 0.25;
+export const SCORE_MIN = 0.30;
 
 interface OrtSession {
   inputNames: string[];
