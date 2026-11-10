@@ -92,3 +92,16 @@ Protocole de ce tour :
 
 Le lot de contrôle n'est plus neuf après ce tour : il ne doit pas servir à re-régler. `volets-final`
 reste le seul juge intact.
+
+### Sources de données (vérifiées)
+
+- **CMP, classe `blind`** : le rapport CMP la définit comme « tout obstacle fonctionnel à la lumière sur
+  la fenêtre, ouvert ou fermé » : volets et stores, extérieurs comme intérieurs. Ce n'est donc pas
+  une classe « volet » stricte ; le détecteur n'en voit que la part extérieure et sombre.
+  Source : [rapport CMP 2013](https://cmp.felk.cvut.cz/~tylecr1/facade/CMP_facade_DB_2013.pdf).
+- **Images CMP restantes** : 25 images (417 volets) ne servent ni à la mise au point, ni au contrôle,
+  ni au lot final. Elles forment une réserve à garder pour un second contrôle, à ouvrir une seule fois.
+- **ADE20K** (liste à 150 classes, [objectInfo150](https://raw.githubusercontent.com/CSAILVision/sceneparsing/master/objectInfo150.csv)) :
+  `blind;screen` (store de fenêtre) et `awning;sunshade;sunblind` (banne). Aucune classe volet extérieur.
+- **RobotCar Facade, ECP, CFP** : pas de classe volet (voir les résumés des jeux).
+- **Photos de la maison** : hors dépôt ; il faut les fournir pour les annoter.
