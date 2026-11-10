@@ -406,6 +406,162 @@
      "classe": "volet"
     }
    ]
+  },
+  {
+   "nom": "u7",
+   "fichier": "banc/volets/photos/u7.jpg",
+   "largeur": 550,
+   "hauteur": 412,
+   "gt": [
+    {
+     "x": 191,
+     "y": 124,
+     "l": 28,
+     "h": 81,
+     "classe": "volet"
+    },
+    {
+     "x": 271,
+     "y": 129,
+     "l": 23,
+     "h": 77,
+     "classe": "volet"
+    },
+    {
+     "x": 302,
+     "y": 132,
+     "l": 22,
+     "h": 74,
+     "classe": "volet"
+    },
+    {
+     "x": 370,
+     "y": 136,
+     "l": 22,
+     "h": 73,
+     "classe": "volet"
+    },
+    {
+     "x": 393,
+     "y": 138,
+     "l": 21,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 455,
+     "y": 142,
+     "l": 19,
+     "h": 68,
+     "classe": "volet"
+    },
+    {
+     "x": 189,
+     "y": 252,
+     "l": 27,
+     "h": 81,
+     "classe": "volet"
+    },
+    {
+     "x": 268,
+     "y": 252,
+     "l": 24,
+     "h": 75,
+     "classe": "volet"
+    },
+    {
+     "x": 391,
+     "y": 250,
+     "l": 23,
+     "h": 69,
+     "classe": "volet"
+    },
+    {
+     "x": 455,
+     "y": 250,
+     "l": 19,
+     "h": 65,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u8",
+   "fichier": "banc/volets/photos/u8.jpg",
+   "largeur": 1200,
+   "hauteur": 800,
+   "gt": [
+    {
+     "x": 336,
+     "y": 378,
+     "l": 24,
+     "h": 84,
+     "classe": "volet"
+    },
+    {
+     "x": 408,
+     "y": 378,
+     "l": 24,
+     "h": 84,
+     "classe": "volet"
+    },
+    {
+     "x": 522,
+     "y": 378,
+     "l": 18,
+     "h": 84,
+     "classe": "volet"
+    },
+    {
+     "x": 594,
+     "y": 378,
+     "l": 24,
+     "h": 84,
+     "classe": "volet"
+    },
+    {
+     "x": 720,
+     "y": 378,
+     "l": 24,
+     "h": 84,
+     "classe": "volet"
+    },
+    {
+     "x": 786,
+     "y": 378,
+     "l": 24,
+     "h": 84,
+     "classe": "volet"
+    },
+    {
+     "x": 300,
+     "y": 502,
+     "l": 42,
+     "h": 90,
+     "classe": "volet"
+    },
+    {
+     "x": 420,
+     "y": 502,
+     "l": 38,
+     "h": 90,
+     "classe": "volet"
+    },
+    {
+     "x": 694,
+     "y": 502,
+     "l": 26,
+     "h": 90,
+     "classe": "volet"
+    },
+    {
+     "x": 802,
+     "y": 502,
+     "l": 38,
+     "h": 90,
+     "classe": "volet"
+    }
+   ]
   }
  ]
 }

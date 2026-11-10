@@ -147,3 +147,9 @@ Les images sont petites (225 à 588 px) : hors de la plage pour laquelle le dét
 Mesure unique (seuil 0,80) : 14 volets justes sur 51, 34 fausses détections. Pas un contrôle
 propre : le détecteur n'a pas été réglé sur ces photos, mais elles n'ont pas non plus servi à
 choisir le seuil, et leur taille est hors plage.
+
+### Deux photos supplémentaires (u7, u8 : 20 volets)
+
+Ajoutées au même lot, dans le même dossier `banc/volets/photos/`. Droits : supposés identiques à ceux des
+six premières, à confirmer par l'auteur. Lot total : 8 photos, 71 volets, toutes mesurées une seule fois
+ou jamais, aucune pour régler le seuil.
