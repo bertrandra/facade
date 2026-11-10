@@ -6,6 +6,7 @@ import { lireExif, champDepuisFocale35 } from './plan/exif.js';
 import { CHAMP_GRAND_COTE_DEFAUT } from './plan/cadrage.js';
 import { versGris, regionUtile, type Gris, type P2, type Redressement, type Segment, type Source } from './auto.js';
 import { operations, type Analyse, type Baie, type Placement, type ResultatBaies, type ResultatRedressement, type ResultatVolets, type ResultatGouttieres, type ResultatFormes } from './operations.js';
+import { detecterVoletsIA } from './volets-ia.js';
 
 type Volet = ResultatVolets['volets'][number];
 type Gouttiere = ResultatGouttieres['gouttieres'][number];
@@ -626,8 +627,6 @@ const COULEUR_FORME: Record<string, string> = { sol: '#e63946', egout: '#8338ec'
 let volets: Volet[] = [];
 let gouttieres: Gouttiere[] = [];
 let formes: Forme[] = [];
-/** Les ouvertures trouvees par le reperage (non corrigees) : le volet s'en sert de voisinage. */
-let baiesDetectees: { x: number; y: number; l: number; h: number }[] = [];
 const autresFaits = new Set<string>();
 const coche = (id: string) => $<HTMLInputElement>(id).checked;
 
@@ -637,9 +636,11 @@ async function reperAutres() {
   const commun = { sortie: dernier.sortie, vu: dernier.vu, l: dernier.l, h: dernier.h, pxParM: echelle };
   try {
     if (coche('ch-volets') && !autresFaits.has('volets')) {
-      message('etat-resultat', 'Repérage des volets…');
-      volets = (await calcul.appeler<ResultatVolets>('volets', { ...commun, baies: baiesDetectees })).volets;
+      message('etat-resultat', 'Détecteur des volets : chargement du modèle (la première fois, environ 10 Mo)…');
+      const trouves = await detecterVoletsIA({ largeur: dernier.l, hauteur: dernier.h, donnees: dernier.sortie });
+      volets = trouves.map((v) => ({ px: v.px, type: 'plein', paire: false, confiance: v.score }));
       autresFaits.add('volets');
+      message('etat-resultat', `${volets.length} volet(s) proposé(s) par le détecteur IA. Vérifiez-les.`, 'info');
     }
     if (coche('ch-gouttieres') && !autresFaits.has('gouttieres')) {
       gouttieres = (await calcul.appeler<ResultatGouttieres>('gouttieres', commun)).gouttieres;
@@ -747,7 +748,6 @@ async function fusionner() {
     volets = [];
     gouttieres = [];
     formes = [];
-    baiesDetectees = [];
     autresFaits.clear();
     const date = new Date();
     const z = (n: number) => String(n).padStart(2, '0');
@@ -867,7 +867,6 @@ async function reperer() {
     // detecteur ne modifie pas ses entrees. A 16 Mpx, une copie de plus pese 77 Mo sur un telephone.
     const r = await calcul.appeler<ResultatBaies>('ouvertures', { sortie: dernier.sortie, vu: dernier.vu, l: dernier.l, h: dernier.h, pxParM: echelle });
     baies = r.baies;
-    baiesDetectees = r.baies.map((b) => ({ x: b.px.x, y: b.px.y, l: b.px.l, h: b.px.h }));
     solPx = r.solPx;
     const estimees = r.baies.filter((b) => b.l > 0).map((b) => b.px.l / b.l).sort((a, b) => a - b);
     echelleEstimee = r.echelleConnue ? null : (estimees[estimees.length >> 1] ?? null);
