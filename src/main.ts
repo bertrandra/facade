@@ -6,7 +6,7 @@ import { lireExif, champDepuisFocale35 } from './plan/exif.js';
 import { CHAMP_GRAND_COTE_DEFAUT } from './plan/cadrage.js';
 import { versGris, regionUtile, type Gris, type P2, type Redressement, type Segment, type Source } from './auto.js';
 import { operations, type Analyse, type Baie, type Placement, type ResultatBaies, type ResultatRedressement, type ResultatVolets, type ResultatGouttieres, type ResultatFormes } from './operations.js';
-import { detecterVoletsIA, detecterYolo, FENETRES_URL, type VoletIA } from './volets-ia.js';
+import { detecterVoletsIA, detecterYolo, FENETRES_URL, COCO_URL, COCO_NOMS, type VoletIA } from './volets-ia.js';
 
 type Volet = ResultatVolets['volets'][number];
 type Gouttiere = ResultatGouttieres['gouttieres'][number];
@@ -663,7 +663,7 @@ let echelleEstimee: number | null = null;
 let baiesCorrigees = false;
 
 /** Les autres types (volets, gouttieres, forme) : calcules une fois par fusion, dessines selon leurs cases. */
-const CASES_AUTRES = ['ch-volets', 'ch-volets-yolo', 'ch-fenetres-yolo', 'ch-gouttieres', 'ch-sol', 'ch-egout', 'ch-pignon', 'ch-toit'] as const;
+const CASES_AUTRES = ['ch-volets', 'ch-volets-yolo', 'ch-fenetres-yolo', 'ch-coco', 'ch-gouttieres', 'ch-sol', 'ch-egout', 'ch-pignon', 'ch-toit'] as const;
 const CASES_FORMES = ['ch-sol', 'ch-egout', 'ch-pignon', 'ch-toit'];
 const CASE_FORME: Record<string, string> = { sol: 'ch-sol', egout: 'ch-egout', pignon: 'ch-pignon', toit: 'ch-toit' };
 const COULEUR_FORME: Record<string, string> = { sol: '#e63946', egout: '#8338ec', pignon: '#06d6a0', toit: '#b5179e' };
@@ -672,6 +672,8 @@ let volets: Volet[] = [];
 let voletsYolo: Volet[] = [];
 /** Fenetres et portes proposees par le modele YOLO (case distincte du reperage des baies). */
 let fenetresYolo: VoletIA[] = [];
+/** Detections du modele COCO (80 classes), affichees avec leur nom. */
+let cocoDetections: VoletIA[] = [];
 /** Les ouvertures trouvees par le reperage (non corrigees) : le detecteur de volets s'en sert de voisinage. */
 let baiesDetectees: { x: number; y: number; l: number; h: number }[] = [];
 let gouttieres: Gouttiere[] = [];
@@ -701,6 +703,12 @@ async function reperAutres() {
       autresFaits.add('fenetresyolo');
       message('etat-resultat', `${fenetresYolo.length} fenêtre(s) ou porte(s) proposée(s) par le détecteur YOLO. Vérifiez-les.`, 'info');
     }
+    if (coche('ch-coco') && !autresFaits.has('coco')) {
+      message('etat-resultat', 'Détection COCO : chargement du modèle (la première fois, environ 10 Mo)…');
+      cocoDetections = await detecterYolo({ largeur: dernier.l, hauteur: dernier.h, donnees: dernier.sortie }, COCO_URL, 0.25);
+      autresFaits.add('coco');
+      message('etat-resultat', `${cocoDetections.length} objet(s) reconnu(s) par le modèle COCO. Vérifiez-les.`, 'info');
+    }
     if (coche('ch-gouttieres') && !autresFaits.has('gouttieres')) {
       gouttieres = (await calcul.appeler<ResultatGouttieres>('gouttieres', commun)).gouttieres;
       autresFaits.add('gouttieres');
@@ -723,6 +731,19 @@ function dessinerAutres(ctx: CanvasRenderingContext2D, k: number) {
   if (coche('ch-volets')) {
     ctx.strokeStyle = '#00b4d8';
     for (const v of volets) ctx.strokeRect(v.px.x * k, v.px.y * k, v.px.l * k, v.px.h * k);
+  }
+  if (coche('ch-coco')) {
+    ctx.font = `600 ${Math.round(u * 9)}px system-ui, sans-serif`;
+    ctx.textBaseline = 'bottom';
+    for (const d of cocoDetections) {
+      ctx.strokeStyle = '#4cc9f0';
+      ctx.strokeRect(d.px.x * k, d.px.y * k, d.px.l * k, d.px.h * k);
+      const t = `${COCO_NOMS[d.classe] ?? d.classe} ${Math.round(d.score * 100)} %`;
+      ctx.fillStyle = 'rgba(0,0,0,.72)';
+      ctx.fillRect(d.px.x * k, d.px.y * k - u * 11, ctx.measureText(t).width + u * 4, u * 11);
+      ctx.fillStyle = '#fff';
+      ctx.fillText(t, d.px.x * k + u * 2, d.px.y * k - u * 1.2);
+    }
   }
   if (coche('ch-fenetres-yolo')) {
     for (const f of fenetresYolo) {
@@ -817,6 +838,7 @@ async function fusionner() {
     volets = [];
     voletsYolo = [];
     fenetresYolo = [];
+    cocoDetections = [];
     baiesDetectees = [];
     gouttieres = [];
     formes = [];

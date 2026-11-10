@@ -16,3 +16,8 @@ Entraînement : `banc/volets/yolo_entrainer.py` ; jeu : `banc/volets/yolo_jeu.py
 `fenetres-yolov10n.onnx` : YOLOv10n (Ultralytics 8.4), deux classes (fenêtre, porte), entraîné à partir des
 poids COCO de THU-MIG/yolov10 (v1.1) sur le jeu public CMP Facade (labels `window` et `door`). Même licence :
 AGPL-3.0 pour le modèle, conditions du jeu CMP vérifiées par l'auteur. Mesures : banc `banc/fenetres/`.
+
+## Modèle COCO (généraliste)
+
+`coco-yolov10n.onnx` : YOLOv10n d'origine (THU-MIG/yolov10 v1.1, entraîné sur COCO, 80 classes), exporté en
+ONNX sans NMS. Licence : AGPL-3.0 (YOLO / Ultralytics) ; jeu COCO : CC BY 4.0 pour les annotations.
