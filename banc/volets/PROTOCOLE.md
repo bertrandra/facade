@@ -172,3 +172,16 @@ Boîtes vérifiées sur l'image ; les feuilles partiellement cachées par les po
 
 u13 : façade à colombages (banque d'images, filigrane) ; u14 : maison aux volets verts ; u15 : façade d'angle.
 Les boîtes de u15 ont été vérifiées sur l'image. Lot total : 15 photos, 140 volets.
+
+### Mesure sur le lot de photos (15 photos, 140 volets), seuil 0,80, une seule fois
+
+| Indicateur | Valeur |
+|---|---|
+| Volets reconnus justes (rappel, « taux de reconnaissance ») | **29 / 140 = 21 %** |
+| Détections fausses | 53 |
+| Précision (justes / détections) | 29 / 82 = 35 % |
+| Photos sans aucune détection juste | 9 sur 15 (u6, u8, u9, u10 à u14 : 0 juste) |
+
+Meilleures photos : u7 (9 justes sur 10), u5 (7 sur 14), u15 (6 sur 16). Le temps dépasse le budget du banc
+sur la plupart des photos (0,4 à 2,7 s). La note globale reste à 0 : le groupe `photos` n'a pas de poids
+dans la notation globale.
