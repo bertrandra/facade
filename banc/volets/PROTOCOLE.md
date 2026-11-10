@@ -41,3 +41,34 @@ Règles : une boîte rendue et un volet annoté s'apparient à IoU ≥ 0,5 ; un 
 | luminance du mur (mode), différence 40 | 0,076 | — |
 | luminance du mur (centile 0,5), différence 40 | 0,108 | — |
 | luminance du mur (centile 0,7), différence 60 | 0,114 | — |
+
+### Classifieur de pixels (régression logistique) et ouvertures voisines
+
+Le détecteur ne seuille plus la luminance : il calcule une probabilité par pixel, à partir de 12
+caractéristiques (`caracteristiques.py`, reprises à l'identique dans `src/volets.ts`, écart 1e-7),
+dont deux viennent des **ouvertures trouvées par le code de façade** (dedans / proximité d'une baie,
+dans sa bande verticale). Les poids (`POIDS` dans `src/volets.ts`) sortent de `entrainer.py`.
+
+```bash
+# 1. les ouvertures du code de facade, une par image du lot
+npx esbuild banc/volets/dump_baies.ts --bundle --platform=node --format=esm --outfile=$S/dump.mjs
+node $S/dump.mjs $S/jeux/volets-dev $S/baies_dev
+# 2. l'entrainement : moitie A des images (noms pairs) ; controle sur la moitie B
+python3 -I banc/volets/entrainer.py $S/jeux/volets-dev $S/baies_dev $S/poids.json
+```
+
+Mesures (note du banc, `volets-dev`, seuil de probabilité 0,85) :
+
+| Ensemble | Note | Remarque |
+|---|---|---|
+| volets-dev, 40 images | 0,242 | |
+| moitié A, 20 images | 0,307 | entraînement : optimiste |
+| moitié B, 20 images | 0,177 | **le seuil 0,85 a été choisi en regardant B** : B n'est plus un contrôle propre |
+| volets-final, 40 images | non ouvert | seul juge encore intact |
+
+Seuil : 0,5 donne 0,06 sur B ; 0,7 donne 0,12 ; 0,85 donne 0,18 ; 0,9 donne 0,04. La courbe est
+pointue : le réglage est fragile. Un réseau à 16 neurones (même entrée) n'a pas fait mieux (F1 pixel
+0,26 sur B, comme le modèle linéaire).
+
+Limites connues : le temps passe la borne du banc (le code de façade pèse ~1 s à lui seul) ; les
+images CMP sont peu nombreuses (40) ; la proximité des baies dépend de la qualité de leur détection.

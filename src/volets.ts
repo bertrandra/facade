@@ -32,12 +32,16 @@ export interface ResultatVolets {
   volets: Volet[];
 }
 
-const TRAVAIL = 1000;
+// Pas de reduction pour les images jusqu'a 1100 px de cote : la version Python du banc (caracteristiques.py) s'y compare pixel a pixel.
+const TRAVAIL = 1100;
 
 interface Travail {
   W: number;
   H: number;
   s: number;
+  R: Float32Array;
+  G: Float32Array;
+  B: Float32Array;
   L: Float32Array;
   ciel: Uint8Array;
   ok: Uint8Array;
@@ -47,7 +51,10 @@ function reduire(img: Image, vu: Uint8Array | null): Travail {
   const s = Math.min(1, TRAVAIL / Math.max(img.largeur, img.hauteur));
   const W = Math.max(1, Math.round(img.largeur * s)),
     H = Math.max(1, Math.round(img.hauteur * s));
-  const L = new Float32Array(W * H),
+  const R = new Float32Array(W * H),
+    G = new Float32Array(W * H),
+    B = new Float32Array(W * H),
+    L = new Float32Array(W * H),
     ciel = new Uint8Array(W * H),
     ok = new Uint8Array(W * H);
   for (let y = 0; y < H; y++) {
@@ -74,31 +81,16 @@ function reduire(img: Image, vu: Uint8Array | null): Travail {
       g /= n;
       b /= n;
       const k = y * W + x;
+      R[k] = r;
+      G[k] = g;
+      B[k] = b;
       L[k] = 0.299 * r + 0.587 * g + 0.114 * b;
       // Ciel : bleu et clair.
       ciel[k] = b - r > 25 && b > g && L[k]! > 120 ? 1 : 0;
       ok[k] = v * 2 >= n ? 1 : 0;
     }
   }
-  return { W, H, s, L, ciel, ok };
-}
-
-/** Luminance du mur : un centile haut de la luminance hors ciel (le mur est le plus clair des plages larges ; les fenetres et les ombres sont dessous). */
-function luminanceMur(t: Travail, centile = 0.7): number {
-  const hist = new Float64Array(256);
-  let n = 0;
-  for (let i = 0; i < t.W * t.H; i++)
-    if (t.ok[i] && !t.ciel[i]) {
-      hist[Math.min(255, Math.max(0, Math.floor(t.L[i]!)))]! += 1;
-      n++;
-    }
-  if (!n) return 128;
-  let cum = 0;
-  for (let v = 0; v < 256; v++) {
-    cum += hist[v]!;
-    if (cum >= centile * n) return v;
-  }
-  return 255;
+  return { W, H, s, R, G, B, L, ciel, ok };
 }
 
 /** Fermeture (dilatation puis erosion) le long d'un axe : comble les trous de moins de `r` pixels. */
@@ -200,16 +192,137 @@ function blocs(m: Uint8Array<ArrayBuffer>, W: number, H: number): Bloc[] {
   return res;
 }
 
-export function detecterVolets(img: Image, vu: Uint8Array | null, pxParM: number | null): ResultatVolets {
+/** Moyenne de `A` sur la fenetre 2r+1 tronquee aux bords (meme definition que banc/volets/caracteristiques.py). */
+export function moyenneLocale(A: Float64Array, W: number, H: number, r: number): Float64Array {
+  const I = new Float64Array((W + 1) * (H + 1));
+  for (let y = 0; y < H; y++) {
+    let ligne = 0;
+    for (let x = 0; x < W; x++) {
+      ligne += A[y * W + x]!;
+      I[(y + 1) * (W + 1) + x + 1] = I[y * (W + 1) + x + 1]! + ligne;
+    }
+  }
+  const out = new Float64Array(W * H);
+  for (let y = 0; y < H; y++) {
+    const y0 = Math.max(0, y - r),
+      y1 = Math.min(H, y + r + 1);
+    for (let x = 0; x < W; x++) {
+      const x0 = Math.max(0, x - r),
+        x1 = Math.min(W, x + r + 1);
+      const s = I[y1 * (W + 1) + x1]! - I[y0 * (W + 1) + x1]! - I[y1 * (W + 1) + x0]! + I[y0 * (W + 1) + x0]!;
+      out[y * W + x] = s / ((y1 - y0) * (x1 - x0));
+    }
+  }
+  return out;
+}
+
+/** Nombre de caracteristiques par pixel (voir caracteristiques.py). */
+export const NB_CARACTERISTIQUES = 12;
+/** Poids de la regression logistique (banc/volets/entrainer.py). */
+export const POIDS: number[] = [-1.0861, 0.9935, -0.4413, 0.6837, 0.2844, -2.4782, 0.0122, 0.0478, 0.0058, 1.4543, 1.4688, -1.0404];
+
+/**
+ * Caracteristiques par pixel de l'image de travail (W x H, RGB dans `rgb`). `baies` : boites (x, y, l, h)
+ * en pixels de travail. Rend N valeurs par pixel, dans l'ordre de caracteristiques.py.
+ */
+export function caracteristiques(rgb: Float64Array, W: number, H: number, baies: { x: number; y: number; l: number; h: number }[]): Float32Array {
+  const n = W * H;
+  const r = new Float64Array(n),
+    g = new Float64Array(n),
+    b = new Float64Array(n),
+    L = new Float64Array(n),
+    L2 = new Float64Array(n);
+  for (let i = 0; i < n; i++) {
+    r[i] = rgb[3 * i]!;
+    g[i] = rgb[3 * i + 1]!;
+    b[i] = rgb[3 * i + 2]!;
+    L[i] = 0.299 * r[i]! + 0.587 * g[i]! + 0.114 * b[i]!;
+    L2[i] = L[i]! * L[i]!;
+  }
+  const m5 = moyenneLocale(L, W, H, 2),
+    m15 = moyenneLocale(L, W, H, 7),
+    m41 = moyenneLocale(L, W, H, 20),
+    m5sq = moyenneLocale(L2, W, H, 2);
+  const gx = new Float64Array(n),
+    gy = new Float64Array(n);
+  for (let y = 0; y < H; y++)
+    for (let x = 0; x < W; x++) {
+      const i = y * W + x;
+      gx[i] = x === 0 ? L[i + 1]! - L[i]! : x === W - 1 ? L[i]! - L[i - 1]! : (L[i + 1]! - L[i - 1]!) / 2;
+      gy[i] = y === 0 ? L[i + W]! - L[i]! : y === H - 1 ? L[i]! - L[i - W]! : (L[i + W]! - L[i - W]!) / 2;
+    }
+  const agx = new Float64Array(n),
+    agy = new Float64Array(n);
+  for (let i = 0; i < n; i++) {
+    agx[i] = Math.abs(gx[i]!);
+    agy[i] = Math.abs(gy[i]!);
+  }
+  const gxm = moyenneLocale(agx, W, H, 1),
+    gym = moyenneLocale(agy, W, H, 1);
+  const dedans = new Float64Array(n),
+    pres = new Float64Array(n);
+  for (const q of baies) {
+    if (!(q.l > 0 && q.h > 0)) continue;
+    for (let y = 0; y < H; y++)
+      for (let x = 0; x < W; x++) {
+        const i = y * W + x;
+        const vert = y >= q.y && y < q.y + q.h;
+        const horiz = x >= q.x && x < q.x + q.l;
+        if (vert && horiz) dedans[i] = 1;
+        if (vert) {
+          const d = x < q.x ? q.x - x : x >= q.x + q.l ? x - (q.x + q.l - 1) : 0;
+          pres[i] = Math.max(pres[i]!, Math.exp(-d / (0.5 * q.l)));
+        }
+      }
+  }
+  const F = new Float32Array(n * NB_CARACTERISTIQUES);
+  for (let i = 0; i < n; i++) {
+    const o = i * NB_CARACTERISTIQUES;
+    const sd5 = Math.sqrt(Math.max(0, m5sq[i]! - m5[i]! * m5[i]!));
+    F[o] = L[i]! / 255;
+    F[o + 1] = (r[i]! - g[i]!) / 255;
+    F[o + 2] = (b[i]! - g[i]!) / 255;
+    F[o + 3] = (L[i]! - m5[i]!) / 255;
+    F[o + 4] = (L[i]! - m15[i]!) / 255;
+    F[o + 5] = (L[i]! - m41[i]!) / 255;
+    F[o + 6] = sd5 / 255;
+    F[o + 7] = gxm[i]! / 255;
+    F[o + 8] = gym[i]! / 255;
+    F[o + 9] = dedans[i]!;
+    F[o + 10] = pres[i]!;
+    F[o + 11] = 1;
+  }
+  return F;
+}
+
+/** Probabilite par pixel qu'il soit un volet (regression logistique sur les caracteristiques). */
+export function probabilites(F: Float32Array, n: number): Float32Array {
+  const p = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    let z = 0;
+    for (let k = 0; k < NB_CARACTERISTIQUES; k++) z += POIDS[k]! * F[i * NB_CARACTERISTIQUES + k]!;
+    p[i] = 1 / (1 + Math.exp(-Math.max(-30, Math.min(30, z))));
+  }
+  return p;
+}
+
+/** Les volets : blocs de pixels probables, puis forme, jumeau, un seul par endroit. `baies` : ouvertures trouvees par le code de facade. */
+export function detecterVolets(img: Image, vu: Uint8Array | null, pxParM: number | null, baies: { x: number; y: number; l: number; h: number }[] = []): ResultatVolets {
   if (img.largeur < 16 || img.hauteur < 16) return { volets: [] };
   const t = reduire(img, vu);
   const { W, H } = t;
   const n = W * H;
-  const lm = luminanceMur(t);
-  const DELTA = 60;
-  // Sombre : nettement plus sombre que le mur, pas du ciel.
+  // Caracteristiques sur l'image de travail (les baies sont donnees en pixels de l'image d'origine).
+  const rgb = new Float64Array(3 * n);
+  for (let i = 0; i < n; i++) {
+    rgb[3 * i] = t.R[i]!;
+    rgb[3 * i + 1] = t.G[i]!;
+    rgb[3 * i + 2] = t.B[i]!;
+  }
+  const bt = baies.map((q) => ({ x: q.x * t.s, y: q.y * t.s, l: q.l * t.s, h: q.h * t.s }));
+  const p = probabilites(caracteristiques(rgb, W, H, bt), n);
   let m = new Uint8Array(n);
-  for (let i = 0; i < n; i++) if (t.ok[i] && !t.ciel[i] && t.L[i]! < lm - DELTA) m[i] = 1;
+  for (let i = 0; i < n; i++) if (t.ok[i] && p[i]! > SEUIL_VOLET) m[i] = 1;
   m = fermer(m, W, H, Math.max(2, Math.round(H * 0.02)), true);
   m = ouvrir(m, W, H, Math.max(2, Math.round(W * 0.006)), false);
   m = ouvrir(m, W, H, Math.max(2, Math.round(H * 0.01)), true);
@@ -231,7 +344,6 @@ export function detecterVolets(img: Image, vu: Uint8Array | null, pxParM: number
     if (fill < 0.6 || asp < 1.3 || asp > 7) continue;
     candidats.push({ ...b, fill, score: fill, paire: false });
   }
-  // Un jumeau : meme hauteur (a 15 % pres), bords alignes en haut, a moins d'une largeur d'ecart.
   for (const a of candidats)
     for (const c of candidats) {
       if (a === c) continue;
@@ -243,9 +355,8 @@ export function detecterVolets(img: Image, vu: Uint8Array | null, pxParM: number
     }
   for (const a of candidats) a.score = 0.6 * a.fill + (a.paire ? 0.4 : 0);
 
-  // Un seul bloc par endroit : le plus sur d'abord.
   const retenus: typeof candidats = [];
-  for (const a of candidats.sort((p, q) => q.score - p.score)) {
+  for (const a of candidats.sort((p2, q) => q.score - p2.score)) {
     const aa = (a.x1 - a.x0) * (a.y1 - a.y0);
     const gene = retenus.some((b) => {
       const ix = Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0),
@@ -254,7 +365,7 @@ export function detecterVolets(img: Image, vu: Uint8Array | null, pxParM: number
     });
     if (!gene) retenus.push(a);
   }
-  retenus.sort((p, q) => p.y0 - q.y0 || p.x0 - q.x0);
+  retenus.sort((p2, q) => p2.y0 - q.y0 || p2.x0 - q.x0);
   const k = 1 / t.s;
   return {
     volets: retenus.map((a) => ({
@@ -265,3 +376,6 @@ export function detecterVolets(img: Image, vu: Uint8Array | null, pxParM: number
     })),
   };
 }
+
+/** Seuil de probabilite d'un pixel « volet ». */
+export const SEUIL_VOLET = 0.85;
