@@ -9,7 +9,7 @@ import type { Image } from './auto.js';
 
 export const RUNTIME_URL = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.1/dist/ort.min.js';
 export const RUNTIME_DOSSIER = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.1/dist/';
-export const MODELE_URL = 'https://raw.githubusercontent.com/bertrandra/facade/claude/intelligent-bohr-pozlb4/modeles/volets-yolov10n.onnx';
+export const MODELE_URL = 'https://raw.githubusercontent.com/bertrandra/facade/6d04280512e9fc7b481450eb996172e7bd83b16b/modeles/volets-yolov10n.onnx';
 /** Le modele des fenetres et portes (meme format, deux classes : 0 fenetre, 1 porte). */
 export const FENETRES_URL = 'https://raw.githubusercontent.com/bertrandra/facade/claude/intelligent-bohr-pozlb4/modeles/fenetres-yolov10n.onnx';
 /** Taille d'entree du modele, et score minimal d'une detection (calé sur le lot de contrôle CMP, voir PROTOCOLE.md). */
