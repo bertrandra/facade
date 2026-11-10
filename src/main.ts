@@ -7,6 +7,8 @@ import { CHAMP_GRAND_COTE_DEFAUT } from './plan/cadrage.js';
 import { versGris, regionUtile, type Gris, type P2, type Redressement, type Segment, type Source } from './auto.js';
 import { operations, type Analyse, type Baie, type Placement, type ResultatBaies, type ResultatRedressement, type ResultatVolets, type ResultatGouttieres, type ResultatFormes } from './operations.js';
 import { detecterVoletsIA, detecterYolo, FENETRES_URL, COCO_URL, COCO_NOMS, type VoletIA } from './volets-ia.js';
+/** Vrai si une des deux options d'ouvertures est cochee (le meme tableau sert aux deux). */
+const ouvertures = () => $<HTMLInputElement>('ch-ouvertures').checked || $<HTMLInputElement>('ch-ouvertures-fusion').checked;
 
 type Volet = ResultatVolets['volets'][number];
 type Gouttiere = ResultatGouttieres['gouttieres'][number];
@@ -661,6 +663,8 @@ let solPx: number | null = null;
 let echelleEstimee: number | null = null;
 /** Les baies ont-elles ete corrigees a la main (un nouveau reperage les effacerait) ? */
 let baiesCorrigees = false;
+/** Ouverture selectionnee dans le tableau (index), ou null. */
+let baieSelection: number | null = null;
 
 /** Les autres types (volets, gouttieres, forme) : calcules une fois par fusion, dessines selon leurs cases. */
 const CASES_AUTRES = ['ch-volets', 'ch-volets-yolo', 'ch-fenetres-yolo', 'ch-coco', 'ch-gouttieres', 'ch-sol', 'ch-egout', 'ch-pignon', 'ch-toit'] as const;
@@ -835,6 +839,7 @@ async function fusionner() {
     solPx = null;
     echelleEstimee = null;
     baiesCorrigees = false;
+    baieSelection = null;
     volets = [];
     voletsYolo = [];
     fenetresYolo = [];
@@ -862,7 +867,7 @@ async function fusionner() {
     );
     majEchelle();
     $('resultat-bloc').hidden = false;
-    if ($<HTMLInputElement>('ch-ouvertures').checked) await reperer();
+    if (ouvertures()) await reperer();
     else majBaies();
     await reperAutres();
     message('etat-resultat', 'Façade redressée. Vous pouvez l’enregistrer.', 'bon');
@@ -904,7 +909,7 @@ function apercu() {
   if (!dernier) return;
   const c = $<HTMLCanvasElement>('resultat');
   const k = reduction(c, 1600);
-  if (baies.length && $<HTMLInputElement>('ch-ouvertures').checked) dessinerBaies(c.getContext('2d')!, k);
+  if (baies.length && ouvertures()) dessinerBaies(c.getContext('2d')!, k);
   dessinerAutres(c.getContext('2d')!, k);
 }
 
@@ -930,7 +935,8 @@ function dessinerBaies(ctx: CanvasRenderingContext2D, k: number) {
       y = b.px.y * k,
       l = b.px.l * k,
       h = b.px.h * k;
-    ctx.strokeStyle = '#ff9f1c';
+    ctx.strokeStyle = i === baieSelection ? '#00e5ff' : '#ff9f1c';
+    ctx.lineWidth = u * (i === baieSelection ? 3.2 : 1.6);
     ctx.strokeRect(x, y, l, h);
     const t = echelle ? `${i + 1} · ${cm(b.px.l)} × ${cm(b.px.h)}` : String(i + 1);
     const tw = ctx.measureText(t).width;
@@ -952,6 +958,31 @@ function resituerSol() {
   solPx = bas.length ? Math.max(...bas) : null;
 }
 
+/**
+ * Fusion des deux detections : celles du calcul (baies.ts) gardent leur place ; une detection YOLO
+ * n'est ajoutee que si elle ne recouvre aucune ouverture deja retenue (IoU < 0,4). Le resultat est
+ * normalise : boites en entiers, types connus, rangs du bas vers le haut, de gauche a droite.
+ */
+function fusionnerOuvertures(calcul: Baie[], yolo: VoletIA[]): Baie[] {
+  const s = echelle ?? echelleEstimee ?? dernier!.l / 12;
+  const iou = (a: Baie['px'], b: { x: number; y: number; l: number; h: number }) => {
+    const ix = Math.max(0, Math.min(a.x + a.l, b.x + b.l) - Math.max(a.x, b.x));
+    const iy = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+    const i = ix * iy;
+    return i / (a.l * a.h + b.l * b.h - i || 1);
+  };
+  const liste: Baie[] = calcul.map((b) => ({ ...b, px: { ...b.px } }));
+  for (const y of yolo) {
+    if (liste.some((b) => iou(b.px, y.px) >= 0.4)) continue;
+    const type: Baie['type'] = y.classe === 1 ? 'porte' : 'fenetre';
+    liste.push({ type, x: y.px.x / s, y: 0, l: y.px.l / s, h: y.px.h / s, carreaux: 1, px: { x: y.px.x, y: y.px.y, l: y.px.l, h: y.px.h } });
+  }
+  for (const b of liste) b.px = { x: Math.round(b.px.x), y: Math.round(b.px.y), l: Math.round(b.px.l), h: Math.round(b.px.h) };
+  const hMed = [...liste.map((b) => b.px.h)].sort((a, b) => a - b)[liste.length >> 1] ?? 1;
+  const rang = (b: Baie) => Math.round((b.px.y + b.px.h) / (0.5 * hMed));
+  return liste.sort((a, b) => rang(b) - rang(a) || a.px.x - b.px.x);
+}
+
 /** Reperage automatique des baies (baies.ts, dans le Worker). Remplace la liste. */
 async function reperer() {
   if (!dernier) return;
@@ -960,14 +991,28 @@ async function reperer() {
     // Pas de copie : postMessage clone deja ce qu'on ne lui transfere pas, et sans Worker le
     // detecteur ne modifie pas ses entrees. A 16 Mpx, une copie de plus pese 77 Mo sur un telephone.
     const r = await calcul.appeler<ResultatBaies>('ouvertures', { sortie: dernier.sortie, vu: dernier.vu, l: dernier.l, h: dernier.h, pxParM: echelle });
-    baies = r.baies;
     baiesDetectees = r.baies.map((b) => ({ x: b.px.x, y: b.px.y, l: b.px.l, h: b.px.h }));
     solPx = r.solPx;
     const estimees = r.baies.filter((b) => b.l > 0).map((b) => b.px.l / b.l).sort((a, b) => a - b);
     echelleEstimee = r.echelleConnue ? null : (estimees[estimees.length >> 1] ?? null);
     baiesCorrigees = false;
-    journal(`baies repérées : ${baies.length}${r.solTrouve ? ', sol situé' : ''}`);
-    message('etat-resultat', baies.length ? `${baies.length} baie(s) repérée(s). Vérifiez-les : ajoutez, recadrez ou retirez au besoin.` : 'Aucune baie repérée : ajoutez-les à la main.', baies.length ? 'bon' : 'info');
+    baieSelection = null;
+    if ($<HTMLInputElement>('ch-ouvertures-fusion').checked) {
+      // Option fusionnee : le modele YOLO (a la demande) complete le calcul, sans doublon.
+      let yolo: VoletIA[] = [];
+      try {
+        message('etat-resultat', 'Ouvertures : chargement du modèle YOLO (la première fois, environ 10 Mo)…');
+        yolo = await detecterYolo({ largeur: dernier.l, hauteur: dernier.h, donnees: dernier.sortie }, FENETRES_URL, 0.3);
+      } catch (e) {
+        journal(`modèle YOLO non utilisé : ${e instanceof Error ? e.message : String(e)}`);
+      }
+      baies = fusionnerOuvertures(r.baies, yolo);
+      journal(`ouvertures fusionnées : ${baies.length} (calcul ${r.baies.length}, YOLO ${yolo.length})`);
+    } else {
+      baies = r.baies;
+      journal(`baies repérées : ${baies.length}${r.solTrouve ? ', sol situé' : ''}`);
+    }
+    message('etat-resultat', baies.length ? `${baies.length} ouverture(s) repérée(s). Cliquez une ligne pour voir sa taille et sa position.` : 'Aucune ouverture repérée : ajoutez-les à la main.', baies.length ? 'bon' : 'info');
   } catch (e) {
     erreur(e);
   }
@@ -976,7 +1021,7 @@ async function reperer() {
 
 /** Le tableau des baies (et l'apercu). */
 function majBaies() {
-  const coche = $<HTMLInputElement>('ch-ouvertures').checked;
+  const coche = ouvertures();
   $('bloc-baies').hidden = !coche;
   const liste = $('liste-ouvertures');
   liste.replaceChildren();
@@ -995,6 +1040,12 @@ function majBaies() {
         else c.append(v);
         tr.append(c);
       };
+      tr.addEventListener('click', (e) => {
+        if ((e.target as HTMLElement).closest('button,select')) return;
+        baieSelection = i;
+        majBaies();
+      });
+      if (i === baieSelection) tr.classList.add('selection');
       td(String(i + 1));
       const sel = document.createElement('select');
       sel.className = 'petit-choix';
@@ -1041,7 +1092,26 @@ function majBaies() {
     t.append(tb);
     liste.append(t);
   }
+  majDetail();
   apercu();
+}
+
+/** La taille et la position de la ligne selectionnee (en m si l'echelle est connue, sinon en px). */
+function majDetail() {
+  const t = $('detail-baie');
+  const b = baieSelection !== null ? baies[baieSelection] : undefined;
+  if (!b || !ouvertures()) {
+    t.textContent = '';
+    return;
+  }
+  const n = (baieSelection ?? 0) + 1;
+  const nom = NOMS_BAIES[b.type] ?? b.type;
+  if (echelle) {
+    const c = cotes(b)!;
+    t.textContent = `${nom} n° ${n} : largeur ${cm(b.px.l)} cm, hauteur ${cm(b.px.h)} cm. Position : ${fr(c.x, 2)} m depuis la gauche${c.appui !== null ? `, appui à ${fr(c.appui, 2)} m du sol` : ''}.`;
+  } else {
+    t.textContent = `${nom} n° ${n} : largeur ${b.px.l} px, hauteur ${b.px.h} px. Position : ${b.px.x} px depuis la gauche, ${b.px.y} px du haut (échelle non posée).`;
+  }
 }
 
 /** Ajouter (i absent) ou recadrer une baie : deux coins opposes poses au doigt sur le resultat. */
@@ -1151,7 +1221,7 @@ async function deuxPoints(mode: 'echelle' | 'mesure') {
   journal(`échelle : ${fr(res.valeur, 2)} m = ${fr(pleine(res.points), 0)} px`);
   majEchelle();
   // L'echelle affine le reperage (tailles admises) ; des baies corrigees a la main sont gardees.
-  if ($<HTMLInputElement>('ch-ouvertures').checked && !baiesCorrigees) await reperer();
+  if (ouvertures() && !baiesCorrigees) await reperer();
   else majBaies();
   await reperAutres();
 }
@@ -1190,7 +1260,7 @@ function enFichier(type: 'image/jpeg' | 'image/png'): Promise<File | null> {
   c.height = h;
   const ctx = c.getContext('2d')!;
   ctx.putImageData(new ImageData(sortie as Uint8ClampedArray<ArrayBuffer>, l, h), 0, 0);
-  if (baies.length && $<HTMLInputElement>('ch-ouvertures').checked) dessinerBaies(ctx, 1);
+  if (baies.length && ouvertures()) dessinerBaies(ctx, 1);
   dessinerAutres(ctx, 1);
   if (echelle && $<HTMLInputElement>('ch-barre').checked) dessinerBarre(ctx, l, h, echelle);
   const nomFinal = echelle ? `${nom}_${Math.round(echelle)}pxm` : nom;
@@ -1302,6 +1372,10 @@ function demarrer() {
   $('fusionner').addEventListener('click', fusionner);
   $('mettre-echelle').addEventListener('click', () => void deuxPoints('echelle'));
   $('mesurer').addEventListener('click', () => void deuxPoints('mesure'));
+  $('ch-ouvertures-fusion').addEventListener('change', () => {
+    if ($<HTMLInputElement>('ch-ouvertures-fusion').checked && !baies.length) void reperer();
+    else majBaies();
+  });
   $('ch-ouvertures').addEventListener('change', () => {
     if ($<HTMLInputElement>('ch-ouvertures').checked && !baies.length) void reperer();
     else majBaies();

@@ -128,6 +128,8 @@ html.fige, html.fige body { overflow: hidden; }
 .actions-baie { display: inline-flex; gap: 4px; }
 .actions-baie .petit { min-height: 36px; min-width: 36px; padding: 4px 8px; font-size: .85rem; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tableau tbody tr { cursor: pointer; }
+.tableau tr.selection td { background: rgba(0, 229, 255, .14); }
 .tableau th { color: var(--discret); font-weight: 600; font-size: .78rem; letter-spacing: .02em; }
 footer { text-align: center; color: var(--discret); font-size: .78rem; padding: 0 0 24px; }
 </style>
@@ -178,6 +180,7 @@ footer { text-align: center; color: var(--discret); font-size: .78rem; padding: 
         <label class="case" id="bloc-barre" hidden><input type="checkbox" id="ch-barre" checked>Barre d’échelle sur l’image enregistrée</label>
         <label class="case"><input type="checkbox" id="ch-ouvertures">Repérer les fenêtres et les portes</label>
         <label class="case"><input type="checkbox" id="ch-fenetres-yolo">Fenêtres et portes (YOLO, téléchargé à la demande, environ 10 Mo)</label>
+        <label class="case"><input type="checkbox" id="ch-ouvertures-fusion">Ouvertures fusionnées (calcul et YOLO, une seule liste)</label>
         <label class="case"><input type="checkbox" id="ch-coco">Détection COCO (80 classes, généraliste, environ 10 Mo)</label>
         <div class="cases-types" id="cases-types">
           <label class="case"><input type="checkbox" id="ch-volets">Volets</label>
@@ -191,6 +194,7 @@ footer { text-align: center; color: var(--discret); font-size: .78rem; padding: 
         <div id="bloc-baies" hidden>
           <p class="discret" id="cotes-aide">Pour les cotes, posez une longueur connue.</p>
           <div id="liste-ouvertures" class="tableau"></div>
+          <p class="discret" id="detail-baie" aria-live="polite"></p>
           <div class="rangee">
             <button type="button" class="second" id="ajouter-baie">Ajouter une baie</button>
             <button type="button" class="second" id="reperer-encore">Repérer à nouveau</button>
