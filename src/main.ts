@@ -6,7 +6,7 @@ import { lireExif, champDepuisFocale35 } from './plan/exif.js';
 import { CHAMP_GRAND_COTE_DEFAUT } from './plan/cadrage.js';
 import { versGris, regionUtile, type Gris, type P2, type Redressement, type Segment, type Source } from './auto.js';
 import { operations, type Analyse, type Baie, type Placement, type ResultatBaies, type ResultatRedressement, type ResultatVolets, type ResultatGouttieres, type ResultatFormes } from './operations.js';
-import { detecterVoletsIA } from './volets-ia.js';
+import { detecterVoletsIA, detecterYolo, FENETRES_URL, type VoletIA } from './volets-ia.js';
 
 type Volet = ResultatVolets['volets'][number];
 type Gouttiere = ResultatGouttieres['gouttieres'][number];
@@ -621,13 +621,15 @@ let echelleEstimee: number | null = null;
 let baiesCorrigees = false;
 
 /** Les autres types (volets, gouttieres, forme) : calcules une fois par fusion, dessines selon leurs cases. */
-const CASES_AUTRES = ['ch-volets', 'ch-volets-yolo', 'ch-gouttieres', 'ch-sol', 'ch-egout', 'ch-pignon', 'ch-toit'] as const;
+const CASES_AUTRES = ['ch-volets', 'ch-volets-yolo', 'ch-fenetres-yolo', 'ch-gouttieres', 'ch-sol', 'ch-egout', 'ch-pignon', 'ch-toit'] as const;
 const CASES_FORMES = ['ch-sol', 'ch-egout', 'ch-pignon', 'ch-toit'];
 const CASE_FORME: Record<string, string> = { sol: 'ch-sol', egout: 'ch-egout', pignon: 'ch-pignon', toit: 'ch-toit' };
 const COULEUR_FORME: Record<string, string> = { sol: '#e63946', egout: '#8338ec', pignon: '#06d6a0', toit: '#b5179e' };
 let volets: Volet[] = [];
 /** Volets proposes par le detecteur YOLO (case distincte, resultats separes). */
 let voletsYolo: Volet[] = [];
+/** Fenetres et portes proposees par le modele YOLO (case distincte du reperage des baies). */
+let fenetresYolo: VoletIA[] = [];
 /** Les ouvertures trouvees par le reperage (non corrigees) : le detecteur de volets s'en sert de voisinage. */
 let baiesDetectees: { x: number; y: number; l: number; h: number }[] = [];
 let gouttieres: Gouttiere[] = [];
@@ -651,6 +653,12 @@ async function reperAutres() {
       autresFaits.add('voletsyolo');
       message('etat-resultat', `${voletsYolo.length} volet(s) proposé(s) par le détecteur YOLO. Vérifiez-les.`, 'info');
     }
+    if (coche('ch-fenetres-yolo') && !autresFaits.has('fenetresyolo')) {
+      message('etat-resultat', 'Détecteur YOLO des fenêtres et portes : chargement du modèle (la première fois, environ 10 Mo)…');
+      fenetresYolo = await detecterYolo({ largeur: dernier.l, hauteur: dernier.h, donnees: dernier.sortie }, FENETRES_URL);
+      autresFaits.add('fenetresyolo');
+      message('etat-resultat', `${fenetresYolo.length} fenêtre(s) ou porte(s) proposée(s) par le détecteur YOLO. Vérifiez-les.`, 'info');
+    }
     if (coche('ch-gouttieres') && !autresFaits.has('gouttieres')) {
       gouttieres = (await calcul.appeler<ResultatGouttieres>('gouttieres', commun)).gouttieres;
       autresFaits.add('gouttieres');
@@ -673,6 +681,12 @@ function dessinerAutres(ctx: CanvasRenderingContext2D, k: number) {
   if (coche('ch-volets')) {
     ctx.strokeStyle = '#00b4d8';
     for (const v of volets) ctx.strokeRect(v.px.x * k, v.px.y * k, v.px.l * k, v.px.h * k);
+  }
+  if (coche('ch-fenetres-yolo')) {
+    for (const f of fenetresYolo) {
+      ctx.strokeStyle = f.classe === 1 ? '#fb5607' : '#ffbe0b';
+      ctx.strokeRect(f.px.x * k, f.px.y * k, f.px.l * k, f.px.h * k);
+    }
   }
   if (coche('ch-volets-yolo')) {
     ctx.strokeStyle = '#ff006e';
@@ -760,6 +774,7 @@ async function fusionner() {
     baiesCorrigees = false;
     volets = [];
     voletsYolo = [];
+    fenetresYolo = [];
     baiesDetectees = [];
     gouttieres = [];
     formes = [];

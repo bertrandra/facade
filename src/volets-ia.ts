@@ -10,6 +10,8 @@ import type { Image } from './auto.js';
 export const RUNTIME_URL = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.1/dist/ort.min.js';
 export const RUNTIME_DOSSIER = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.1/dist/';
 export const MODELE_URL = 'https://raw.githubusercontent.com/bertrandra/facade/claude/intelligent-bohr-pozlb4/modeles/volets-yolov10n.onnx';
+/** Le modele des fenetres et portes (meme format, deux classes : 0 fenetre, 1 porte). */
+export const FENETRES_URL = 'https://raw.githubusercontent.com/bertrandra/facade/claude/intelligent-bohr-pozlb4/modeles/fenetres-yolov10n.onnx';
 /** Taille d'entree du modele, et score minimal d'une detection (calé sur le lot de contrôle CMP, voir PROTOCOLE.md). */
 const TAILLE = 640;
 export const SCORE_MIN = 0.30;
@@ -24,7 +26,8 @@ interface Ort {
   InferenceSession: { create(bytes: Uint8Array, opts: { executionProviders: string[] }): Promise<OrtSession> };
 }
 
-let session: Promise<OrtSession> | null = null;
+/** Une session par modele (cle : adresse du modele). */
+const sessions = new Map<string, Promise<OrtSession>>();
 
 /** Charge le runtime (script du CDN, une fois). */
 function chargerRuntime(): Promise<Ort> {
@@ -39,30 +42,34 @@ function chargerRuntime(): Promise<Ort> {
   });
 }
 
-/** Charge le modele et la session, une fois. */
-export function chargerDetecteur(): Promise<OrtSession> {
-  if (!session) {
-    session = (async () => {
+/** Charge un modele et sa session, une fois par adresse. */
+export function chargerDetecteur(url = MODELE_URL): Promise<OrtSession> {
+  let s = sessions.get(url);
+  if (!s) {
+    s = (async () => {
       const ort = await chargerRuntime();
       ort.env.wasm.wasmPaths = RUNTIME_DOSSIER;
       ort.env.wasm.numThreads = 1;
-      const rep = await fetch(MODELE_URL);
+      const rep = await fetch(url);
       if (!rep.ok) throw new Error(`le modèle n’a pas pu être téléchargé (${rep.status})`);
       return ort.InferenceSession.create(new Uint8Array(await rep.arrayBuffer()), { executionProviders: ['wasm'] });
     })();
-    session.catch(() => (session = null));
+    s.catch(() => sessions.delete(url));
+    sessions.set(url, s);
   }
-  return session;
+  return s;
 }
 
 export interface VoletIA {
   px: { x: number; y: number; l: number; h: number };
   score: number;
+  /** Indice de classe du modele (0 pour le modele des volets). */
+  classe: number;
 }
 
-/** Les volets de l'image redressee (pixels RGBA). `echelle` : facteur de l'image d'entree, si utile. */
-export async function detecterVoletsIA(img: Image, seuil = SCORE_MIN): Promise<VoletIA[]> {
-  const s = await chargerDetecteur();
+/** Detections d'un modele YOLO sur l'image redressee (pixels RGBA), sans NMS (le modele en rend 300). */
+export async function detecterYolo(img: Image, modele: string, seuil = SCORE_MIN): Promise<VoletIA[]> {
+  const s = await chargerDetecteur(modele);
   const ort = (window as unknown as { ort: Ort }).ort;
   // Letterbox : mise a l'echelle sans deformation, marge grise (114), comme a l'entrainement.
   const k = Math.min(TAILLE / img.largeur, TAILLE / img.hauteur);
@@ -97,12 +104,18 @@ export async function detecterVoletsIA(img: Image, seuil = SCORE_MIN): Promise<V
     const o = 6 * i;
     const score = d[o + 4]!;
     if (score < seuil) continue;
+    const classe = Math.round(d[o + 5]!);
     const x0 = Math.max(0, (d[o]! - px) / k),
       y0 = Math.max(0, (d[o + 1]! - py) / k),
       x1 = Math.min(img.largeur, (d[o + 2]! - px) / k),
       y1 = Math.min(img.hauteur, (d[o + 3]! - py) / k);
     if (x1 - x0 < 2 || y1 - y0 < 2) continue;
-    res.push({ px: { x: x0, y: y0, l: x1 - x0, h: y1 - y0 }, score: Math.round(score * 100) / 100 });
+    res.push({ px: { x: x0, y: y0, l: x1 - x0, h: y1 - y0 }, score: Math.round(score * 100) / 100, classe });
   }
   return res;
+}
+
+/** Les volets (modele des volets, MODELE_URL). */
+export function detecterVoletsIA(img: Image, seuil = SCORE_MIN): Promise<VoletIA[]> {
+  return detecterYolo(img, MODELE_URL, seuil);
 }
