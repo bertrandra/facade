@@ -158,3 +158,7 @@ ou jamais, aucune pour régler le seuil.
 
 Une photo de plus : 8 volets, lot total 79 volets sur 9 photos. Source : polyhabitat.fr, droits
 confirmés par l'auteur du dépôt.
+
+### Deux photos supplémentaires (u10, u11 : 18 volets), droits confirmés par l'auteur
+
+Lot total : 11 photos, 97 volets. Les boîtes ont été vérifiées sur l'image pour u10.
