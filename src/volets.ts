@@ -217,9 +217,9 @@ export function moyenneLocale(A: Float64Array, W: number, H: number, r: number):
 }
 
 /** Nombre de caracteristiques par pixel (voir caracteristiques.py). */
-export const NB_CARACTERISTIQUES = 12;
+export const NB_CARACTERISTIQUES = 20;
 /** Poids de la regression logistique (banc/volets/entrainer.py). */
-export const POIDS: number[] = [-1.0861, 0.9935, -0.4413, 0.6837, 0.2844, -2.4782, 0.0122, 0.0478, 0.0058, 1.4543, 1.4688, -1.0404];
+export const POIDS: number[] = [-0.9383, 0.7830, -0.1114, 0.6172, 0.1704, -2.4036, -0.0461, -0.0463, 0.0162, 1.8752, 0.1968, -2.8188, -0.1424, -0.0054, 0.0331, -0.1072, -0.0245, 0.8095, 0.1339, 2.4372];
 
 /**
  * Caracteristiques par pixel de l'image de travail (W x H, RGB dans `rgb`). `baies` : boites (x, y, l, h)
@@ -259,6 +259,25 @@ export function caracteristiques(rgb: Float64Array, W: number, H: number, baies:
   }
   const gxm = moyenneLocale(agx, W, H, 1),
     gym = moyenneLocale(agy, W, H, 1);
+  const gx4 = moyenneLocale(agx, W, H, 4),
+    gy4 = moyenneLocale(agy, W, H, 4),
+    gx7 = moyenneLocale(agx, W, H, 7),
+    gy7 = moyenneLocale(agy, W, H, 7);
+  const sat = new Float64Array(n),
+    V = new Float64Array(n);
+  for (let i = 0; i < n; i++) {
+    const mx = Math.max(r[i]!, g[i]!, b[i]!),
+      mn = Math.min(r[i]!, g[i]!, b[i]!);
+    sat[i] = (mx - mn) / (mx + 1);
+    V[i] = mx / 255;
+  }
+  const sat7 = moyenneLocale(sat, W, H, 7),
+    V7 = moyenneLocale(V, W, H, 7);
+  const vert = new Float64Array(n);
+  for (const q of baies) {
+    if (!(q.l > 0 && q.h > 0)) continue;
+    for (let y = q.y; y < q.y + q.h && y < H; y++) for (let x = 0; x < W; x++) if (y >= 0) vert[y * W + x] = 1;
+  }
   const dedans = new Float64Array(n),
     pres = new Float64Array(n);
   for (const q of baies) {
@@ -291,6 +310,14 @@ export function caracteristiques(rgb: Float64Array, W: number, H: number, baies:
     F[o + 9] = dedans[i]!;
     F[o + 10] = pres[i]!;
     F[o + 11] = 1;
+    F[o + 12] = gx4[i]! / 255;
+    F[o + 13] = gy4[i]! / 255;
+    F[o + 14] = gy7[i]! / 255;
+    F[o + 15] = gx7[i]! / 255;
+    F[o + 16] = sat[i]!;
+    F[o + 17] = sat7[i]!;
+    F[o + 18] = V[i]! - V7[i]!;
+    F[o + 19] = vert[i]!;
   }
   return F;
 }
@@ -307,7 +334,7 @@ export function probabilites(F: Float32Array, n: number): Float32Array {
 }
 
 /** Les volets : blocs de pixels probables, puis forme, jumeau, un seul par endroit. `baies` : ouvertures trouvees par le code de facade. */
-export function detecterVolets(img: Image, vu: Uint8Array | null, pxParM: number | null, baies: { x: number; y: number; l: number; h: number }[] = []): ResultatVolets {
+export function detecterVolets(img: Image, vu: Uint8Array | null, pxParM: number | null, baies: { x: number; y: number; l: number; h: number }[] = [], seuil = SEUIL_VOLET): ResultatVolets {
   if (img.largeur < 16 || img.hauteur < 16) return { volets: [] };
   const t = reduire(img, vu);
   const { W, H } = t;
@@ -322,7 +349,7 @@ export function detecterVolets(img: Image, vu: Uint8Array | null, pxParM: number
   const bt = baies.map((q) => ({ x: q.x * t.s, y: q.y * t.s, l: q.l * t.s, h: q.h * t.s }));
   const p = probabilites(caracteristiques(rgb, W, H, bt), n);
   let m = new Uint8Array(n);
-  for (let i = 0; i < n; i++) if (t.ok[i] && p[i]! > SEUIL_VOLET) m[i] = 1;
+  for (let i = 0; i < n; i++) if (t.ok[i] && p[i]! > seuil) m[i] = 1;
   m = fermer(m, W, H, Math.max(2, Math.round(H * 0.02)), true);
   m = ouvrir(m, W, H, Math.max(2, Math.round(W * 0.006)), false);
   m = ouvrir(m, W, H, Math.max(2, Math.round(H * 0.01)), true);
@@ -378,4 +405,4 @@ export function detecterVolets(img: Image, vu: Uint8Array | null, pxParM: number
 }
 
 /** Seuil de probabilite d'un pixel « volet ». */
-export const SEUIL_VOLET = 0.85;
+export const SEUIL_VOLET = 0.8;

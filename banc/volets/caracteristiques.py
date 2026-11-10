@@ -3,7 +3,7 @@
 # Entree : RGB uint8 (H, W, 3) ; sortie : (H, W, N) float32, N = NB_CARACTERISTIQUES.
 import numpy as np
 
-NB_CARACTERISTIQUES = 12
+NB_CARACTERISTIQUES = 20
 
 def moyenne_locale(A, r):
     """Moyenne de A sur la fenetre 2r+1 tronquee aux bords (la meme que la version TypeScript)."""
@@ -40,10 +40,26 @@ def caracteristiques(rgb, baies):
         vert = (yy >= by) & (yy < by + bh)
         d = np.where(xx < bx, bx - xx, np.where(xx >= bx + bl, xx - (bx + bl - 1), 0)).astype(np.float64)
         pres = np.maximum(pres, np.where(vert, np.exp(-d / (0.5 * bl)), 0.0))
+    # Densites d'aretes a plus grande echelle : les lames font des aretes horizontales regulieres.
+    gx4 = moyenne_locale(np.abs(gx), 4); gy4 = moyenne_locale(np.abs(gy), 4)
+    gy7 = moyenne_locale(np.abs(gy), 7); gx7 = moyenne_locale(np.abs(gx), 7)
+    # Saturation (ecart des canaux) et luminosite (max des canaux), locales.
+    mx = np.maximum(np.maximum(r, g), b); mn = np.minimum(np.minimum(r, g), b)
+    sat = (mx - mn) / (mx + 1)
+    sat7 = moyenne_locale(sat, 7)
+    V = mx / 255
+    V7 = moyenne_locale(V, 7)
+    # Bande verticale d'une baie (sans l'eloignement horizontal).
+    vert = np.zeros((H, W))
+    for (bx, by, bl, bh) in baies:
+        if bl <= 0 or bh <= 0: continue
+        vert = np.maximum(vert, ((yy >= by) & (yy < by + bh)).astype(np.float64))
     F = np.stack([
         L / 255, (r - g) / 255, (b - g) / 255,
         (L - m5) / 255, (L - m15) / 255, (L - m41) / 255,
         sd5 / 255, gxm / 255, gym / 255,
         dedans, pres, np.ones_like(L),
+        gx4 / 255, gy4 / 255, gy7 / 255, gx7 / 255,
+        sat, sat7, V - V7, vert,
     ], axis=-1)
     return F.astype(np.float32)

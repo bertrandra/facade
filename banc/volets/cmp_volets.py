@@ -2,8 +2,9 @@
 # les volets (classe 8, « blind » dans label_names.txt) sont les boites a trouver. Selection
 # reproductible : les images qui ont au moins un volet, melangees par graine, coupees en deux jeux :
 #   volets-dev    : la mise au point (on y regarde, on y regle) ;
-#   volets-final  : tenu a l'ecart (on ne le regarde qu'une fois la version figee).
-# Usage : python3 -I banc/volets/cmp_volets.py <dossier base/ du jeu CMP> <dossier de sortie> [n_dev] [n_final]
+#   volets-final  : tenu a l'ecart (on ne le regarde qu'une fois la version figee) ;
+#   volets-ctrl   : controle neuf, pris apres les deux autres (pour choisir un seuil sans toucher au final).
+# Usage : python3 -I banc/volets/cmp_volets.py <dossier base/ du jeu CMP> <dossier de sortie> [n_dev] [n_final] [n_ctrl]
 import re, sys, os, json, glob, random
 import numpy as np
 from PIL import Image
@@ -13,6 +14,7 @@ LABEL_FENETRE = 3
 base, sortie = sys.argv[1], sys.argv[2]
 n_dev = int(sys.argv[3]) if len(sys.argv) > 3 else 40
 n_fin = int(sys.argv[4]) if len(sys.argv) > 4 else 40
+n_ctrl = int(sys.argv[5]) if len(sys.argv) > 5 else 40
 
 def objets(xml):
     t = open(xml, encoding='latin-1').read()
@@ -31,7 +33,7 @@ for xml in sorted(glob.glob(os.path.join(base, '*.xml'))):
     if any(o[0] == LABEL_VOLET for o in objets(xml)) and os.path.exists(os.path.join(base, nom + '.jpg')):
         eligibles.append(nom)
 random.Random(20261110).shuffle(eligibles)
-lots = {'volets-dev': eligibles[:n_dev], 'volets-final': eligibles[n_dev:n_dev + n_fin]}
+lots = {'volets-dev': eligibles[:n_dev], 'volets-final': eligibles[n_dev:n_dev + n_fin], 'volets-ctrl': eligibles[n_dev + n_fin:n_dev + n_fin + n_ctrl]}
 for nom_lot, noms in lots.items():
     d = os.path.join(sortie, nom_lot)
     os.makedirs(d, exist_ok=True)

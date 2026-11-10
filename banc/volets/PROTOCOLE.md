@@ -72,3 +72,23 @@ pointue : le réglage est fragile. Un réseau à 16 neurones (même entrée) n'a
 
 Limites connues : le temps passe la borne du banc (le code de façade pèse ~1 s à lui seul) ; les
 images CMP sont peu nombreuses (40) ; la proximité des baies dépend de la qualité de leur détection.
+
+### Deuxième version : 20 caractéristiques, lot de contrôle neuf
+
+Ajouts : densité d'arêtes à plus grande échelle (lames), saturation, luminosité relative au voisinage,
+bande verticale d'une baie. Toujours une régression logistique ; poids dans `POIDS` (`src/volets.ts`).
+
+Protocole de ce tour :
+- entraînement : moitié A du lot dev (`entrainer.py`) ;
+- choix du seuil : moitié B du lot dev, par la note du banc (`VOLETS_SEUIL=… evaluer.mjs`) ;
+- **contrôle : `volets-ctrl`**, 40 images CMP neuves (indices 80 à 119 de la liste reproductible),
+  mesuré **une seule fois** avec le seuil choisi sur B.
+
+| Ensemble | Seuil | Note | Rappel | Précision |
+|---|---|---|---|---|
+| moitié B (choix du seuil) | 0,60 / 0,70 / **0,80** / 0,85 / 0,90 | 0,062 / 0,124 / **0,200** / 0,179 / 0,107 | | |
+| **volets-ctrl** (une seule mesure) | 0,80 | **0,233** | 27 % | 21 % |
+| volets-final | non ouvert | | | |
+
+Le lot de contrôle n'est plus neuf après ce tour : il ne doit pas servir à re-régler. `volets-final`
+reste le seul juge intact.

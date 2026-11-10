@@ -8,7 +8,9 @@ import type { Image } from '../../src/auto.js';
 
 export function detecterBaies2(img: Image, vu: Uint8Array | null, pxParM: number | null) {
   const baies = detecterBaies(img, vu, pxParM).baies.map((b) => ({ x: b.px.x, y: b.px.y, l: b.px.l, h: b.px.h }));
-  const r = detecterVolets(img, vu, pxParM, baies);
+  // Seuil de probabilite : VOLETS_SEUIL (pour le choisir sur le controle), 0,80 sinon.
+  const seuil = Number(process.env.VOLETS_SEUIL ?? 0.8);
+  const r = detecterVolets(img, vu, pxParM, baies, seuil);
   return { baies: r.volets.map((v) => ({ type: 'fenetre', px: v.px, carreaux: v.paire ? 2 : 1 })), solTrouve: false, solPx: null, echelleConnue: pxParM !== null };
 }
 export { detecterBaies2 as detecterBaies };
