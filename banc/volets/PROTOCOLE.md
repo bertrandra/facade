@@ -137,3 +137,13 @@ le groupe `commons` n'a pas de poids dans la notation globale (0,55 maison, 0,35
 
 Conclusion : le détecteur ne se transfère pas hors du jeu CMP. Il ne faut pas s'appuyer sur ses cases
 « Volets » tant qu'il n'a pas été refait sur des données plus variées.
+
+### Photos fournies par l'auteur (6 images, 51 volets)
+
+Fichiers : `banc/volets/photos/u1.jpg` à `u6.jpg` (240 Ko), annotations dans
+`banc/volets/annotations/photos-volets.json`. Droits : confirmés par l'auteur du dépôt.
+Les images sont petites (225 à 588 px) : hors de la plage pour laquelle le détecteur est réglé.
+
+Mesure unique (seuil 0,80) : 14 volets justes sur 51, 34 fausses détections. Pas un contrôle
+propre : le détecteur n'a pas été réglé sur ces photos, mais elles n'ont pas non plus servi à
+choisir le seuil, et leur taille est hors plage.

@@ -1,0 +1,411 @@
+{
+ "jeu": "photos-volets (fournies par l'auteur)",
+ "note": "Photos fournies par l'auteur du depot, qui en detient les droits. Boites a la main sur grille (environ +/-10-20 px), dans le repere de la photo d'origine.",
+ "images": [
+  {
+   "nom": "u1",
+   "fichier": "banc/volets/photos/u1.jpg",
+   "largeur": 225,
+   "hauteur": 225,
+   "gt": [
+    {
+     "x": 20,
+     "y": 101,
+     "l": 19,
+     "h": 72,
+     "classe": "volet"
+    },
+    {
+     "x": 78,
+     "y": 101,
+     "l": 18,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 135,
+     "y": 101,
+     "l": 19,
+     "h": 69,
+     "classe": "volet"
+    },
+    {
+     "x": 191,
+     "y": 101,
+     "l": 22,
+     "h": 70,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u2",
+   "fichier": "banc/volets/photos/u2.jpg",
+   "largeur": 250,
+   "hauteur": 193,
+   "gt": [
+    {
+     "x": 105,
+     "y": 40,
+     "l": 13,
+     "h": 24,
+     "classe": "volet"
+    },
+    {
+     "x": 138,
+     "y": 40,
+     "l": 12,
+     "h": 24,
+     "classe": "volet"
+    },
+    {
+     "x": 188,
+     "y": 38,
+     "l": 12,
+     "h": 24,
+     "classe": "volet"
+    },
+    {
+     "x": 221,
+     "y": 38,
+     "l": 14,
+     "h": 24,
+     "classe": "volet"
+    },
+    {
+     "x": 2,
+     "y": 85,
+     "l": 9,
+     "h": 27,
+     "classe": "volet"
+    },
+    {
+     "x": 38,
+     "y": 85,
+     "l": 10,
+     "h": 27,
+     "classe": "volet"
+    },
+    {
+     "x": 103,
+     "y": 91,
+     "l": 11,
+     "h": 41,
+     "classe": "volet"
+    },
+    {
+     "x": 137,
+     "y": 92,
+     "l": 12,
+     "h": 40,
+     "classe": "volet"
+    },
+    {
+     "x": 188,
+     "y": 91,
+     "l": 12,
+     "h": 41,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u3",
+   "fichier": "banc/volets/photos/u3.jpg",
+   "largeur": 554,
+   "hauteur": 554,
+   "gt": [
+    {
+     "x": 64,
+     "y": 285,
+     "l": 41,
+     "h": 119,
+     "classe": "volet"
+    },
+    {
+     "x": 175,
+     "y": 284,
+     "l": 33,
+     "h": 118,
+     "classe": "volet"
+    },
+    {
+     "x": 336,
+     "y": 292,
+     "l": 30,
+     "h": 67,
+     "classe": "volet"
+    },
+    {
+     "x": 427,
+     "y": 292,
+     "l": 34,
+     "h": 65,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u4",
+   "fichier": "banc/volets/photos/u4.jpg",
+   "largeur": 480,
+   "hauteur": 639,
+   "gt": [
+    {
+     "x": 257,
+     "y": 228,
+     "l": 24,
+     "h": 53,
+     "classe": "volet"
+    },
+    {
+     "x": 330,
+     "y": 240,
+     "l": 20,
+     "h": 46,
+     "classe": "volet"
+    },
+    {
+     "x": 379,
+     "y": 245,
+     "l": 22,
+     "h": 45,
+     "classe": "volet"
+    },
+    {
+     "x": 437,
+     "y": 252,
+     "l": 18,
+     "h": 43,
+     "classe": "volet"
+    },
+    {
+     "x": 24,
+     "y": 353,
+     "l": 38,
+     "h": 110,
+     "classe": "volet"
+    },
+    {
+     "x": 137,
+     "y": 355,
+     "l": 33,
+     "h": 72,
+     "classe": "volet"
+    },
+    {
+     "x": 247,
+     "y": 355,
+     "l": 31,
+     "h": 91,
+     "classe": "volet"
+    },
+    {
+     "x": 334,
+     "y": 358,
+     "l": 26,
+     "h": 88,
+     "classe": "volet"
+    },
+    {
+     "x": 379,
+     "y": 358,
+     "l": 27,
+     "h": 86,
+     "classe": "volet"
+    },
+    {
+     "x": 449,
+     "y": 360,
+     "l": 21,
+     "h": 79,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u5",
+   "fichier": "banc/volets/photos/u5.jpg",
+   "largeur": 588,
+   "hauteur": 393,
+   "gt": [
+    {
+     "x": 223,
+     "y": 165,
+     "l": 13,
+     "h": 50,
+     "classe": "volet"
+    },
+    {
+     "x": 270,
+     "y": 165,
+     "l": 16,
+     "h": 50,
+     "classe": "volet"
+    },
+    {
+     "x": 306,
+     "y": 165,
+     "l": 14,
+     "h": 50,
+     "classe": "volet"
+    },
+    {
+     "x": 353,
+     "y": 165,
+     "l": 15,
+     "h": 50,
+     "classe": "volet"
+    },
+    {
+     "x": 383,
+     "y": 165,
+     "l": 14,
+     "h": 50,
+     "classe": "volet"
+    },
+    {
+     "x": 427,
+     "y": 165,
+     "l": 15,
+     "h": 50,
+     "classe": "volet"
+    },
+    {
+     "x": 222,
+     "y": 244,
+     "l": 14,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 274,
+     "y": 244,
+     "l": 17,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 303,
+     "y": 244,
+     "l": 19,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 357,
+     "y": 244,
+     "l": 16,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 383,
+     "y": 244,
+     "l": 20,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 434,
+     "y": 244,
+     "l": 16,
+     "h": 71,
+     "classe": "volet"
+    },
+    {
+     "x": 112,
+     "y": 250,
+     "l": 13,
+     "h": 23,
+     "classe": "volet"
+    },
+    {
+     "x": 153,
+     "y": 250,
+     "l": 15,
+     "h": 20,
+     "classe": "volet"
+    }
+   ]
+  },
+  {
+   "nom": "u6",
+   "fichier": "banc/volets/photos/u6.jpg",
+   "largeur": 520,
+   "hauteur": 384,
+   "gt": [
+    {
+     "x": 221,
+     "y": 81,
+     "l": 16,
+     "h": 49,
+     "classe": "volet"
+    },
+    {
+     "x": 285,
+     "y": 78,
+     "l": 21,
+     "h": 49,
+     "classe": "volet"
+    },
+    {
+     "x": 382,
+     "y": 78,
+     "l": 24,
+     "h": 47,
+     "classe": "volet"
+    },
+    {
+     "x": 452,
+     "y": 78,
+     "l": 26,
+     "h": 47,
+     "classe": "volet"
+    },
+    {
+     "x": 16,
+     "y": 169,
+     "l": 16,
+     "h": 55,
+     "classe": "volet"
+    },
+    {
+     "x": 78,
+     "y": 169,
+     "l": 26,
+     "h": 55,
+     "classe": "volet"
+    },
+    {
+     "x": 216,
+     "y": 182,
+     "l": 21,
+     "h": 78,
+     "classe": "volet"
+    },
+    {
+     "x": 285,
+     "y": 182,
+     "l": 22,
+     "h": 78,
+     "classe": "volet"
+    },
+    {
+     "x": 385,
+     "y": 182,
+     "l": 26,
+     "h": 78,
+     "classe": "volet"
+    },
+    {
+     "x": 458,
+     "y": 182,
+     "l": 26,
+     "h": 78,
+     "classe": "volet"
+    }
+   ]
+  }
+ ]
+}
