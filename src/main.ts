@@ -621,10 +621,15 @@ let echelleEstimee: number | null = null;
 let baiesCorrigees = false;
 
 /** Les autres types (volets, gouttieres, forme) : calcules une fois par fusion, dessines selon leurs cases. */
-const CASES_AUTRES = ['ch-volets', 'ch-gouttieres', 'ch-sol', 'ch-egout', 'ch-pignon', 'ch-toit'] as const;
+const CASES_AUTRES = ['ch-volets', 'ch-volets-yolo', 'ch-gouttieres', 'ch-sol', 'ch-egout', 'ch-pignon', 'ch-toit'] as const;
+const CASES_FORMES = ['ch-sol', 'ch-egout', 'ch-pignon', 'ch-toit'];
 const CASE_FORME: Record<string, string> = { sol: 'ch-sol', egout: 'ch-egout', pignon: 'ch-pignon', toit: 'ch-toit' };
 const COULEUR_FORME: Record<string, string> = { sol: '#e63946', egout: '#8338ec', pignon: '#06d6a0', toit: '#b5179e' };
 let volets: Volet[] = [];
+/** Volets proposes par le detecteur YOLO (case distincte, resultats separes). */
+let voletsYolo: Volet[] = [];
+/** Les ouvertures trouvees par le reperage (non corrigees) : le detecteur de volets s'en sert de voisinage. */
+let baiesDetectees: { x: number; y: number; l: number; h: number }[] = [];
 let gouttieres: Gouttiere[] = [];
 let formes: Forme[] = [];
 const autresFaits = new Set<string>();
@@ -636,17 +641,21 @@ async function reperAutres() {
   const commun = { sortie: dernier.sortie, vu: dernier.vu, l: dernier.l, h: dernier.h, pxParM: echelle };
   try {
     if (coche('ch-volets') && !autresFaits.has('volets')) {
-      message('etat-resultat', 'Détecteur des volets : chargement du modèle (la première fois, environ 10 Mo)…');
-      const trouves = await detecterVoletsIA({ largeur: dernier.l, hauteur: dernier.h, donnees: dernier.sortie });
-      volets = trouves.map((v) => ({ px: v.px, type: 'plein', paire: false, confiance: v.score }));
+      volets = (await calcul.appeler<ResultatVolets>('volets', { ...commun, baies: baiesDetectees })).volets;
       autresFaits.add('volets');
-      message('etat-resultat', `${volets.length} volet(s) proposé(s) par le détecteur IA. Vérifiez-les.`, 'info');
+    }
+    if (coche('ch-volets-yolo') && !autresFaits.has('voletsyolo')) {
+      message('etat-resultat', 'Détecteur YOLO des volets : chargement du modèle (la première fois, environ 10 Mo)…');
+      const trouves = await detecterVoletsIA({ largeur: dernier.l, hauteur: dernier.h, donnees: dernier.sortie });
+      voletsYolo = trouves.map((v) => ({ px: v.px, type: 'plein', paire: false, confiance: v.score }));
+      autresFaits.add('voletsyolo');
+      message('etat-resultat', `${voletsYolo.length} volet(s) proposé(s) par le détecteur YOLO. Vérifiez-les.`, 'info');
     }
     if (coche('ch-gouttieres') && !autresFaits.has('gouttieres')) {
       gouttieres = (await calcul.appeler<ResultatGouttieres>('gouttieres', commun)).gouttieres;
       autresFaits.add('gouttieres');
     }
-    if (CASES_AUTRES.slice(2).some(coche) && !autresFaits.has('formes')) {
+    if (CASES_FORMES.some(coche) && !autresFaits.has('formes')) {
       formes = (await calcul.appeler<ResultatFormes>('formes', commun)).formes;
       autresFaits.add('formes');
     }
@@ -664,6 +673,10 @@ function dessinerAutres(ctx: CanvasRenderingContext2D, k: number) {
   if (coche('ch-volets')) {
     ctx.strokeStyle = '#00b4d8';
     for (const v of volets) ctx.strokeRect(v.px.x * k, v.px.y * k, v.px.l * k, v.px.h * k);
+  }
+  if (coche('ch-volets-yolo')) {
+    ctx.strokeStyle = '#ff006e';
+    for (const v of voletsYolo) ctx.strokeRect(v.px.x * k, v.px.y * k, v.px.l * k, v.px.h * k);
   }
   if (coche('ch-gouttieres')) {
     ctx.strokeStyle = '#90be6d';
@@ -746,6 +759,8 @@ async function fusionner() {
     echelleEstimee = null;
     baiesCorrigees = false;
     volets = [];
+    voletsYolo = [];
+    baiesDetectees = [];
     gouttieres = [];
     formes = [];
     autresFaits.clear();
@@ -867,6 +882,7 @@ async function reperer() {
     // detecteur ne modifie pas ses entrees. A 16 Mpx, une copie de plus pese 77 Mo sur un telephone.
     const r = await calcul.appeler<ResultatBaies>('ouvertures', { sortie: dernier.sortie, vu: dernier.vu, l: dernier.l, h: dernier.h, pxParM: echelle });
     baies = r.baies;
+    baiesDetectees = r.baies.map((b) => ({ x: b.px.x, y: b.px.y, l: b.px.l, h: b.px.h }));
     solPx = r.solPx;
     const estimees = r.baies.filter((b) => b.l > 0).map((b) => b.px.l / b.l).sort((a, b) => a - b);
     echelleEstimee = r.echelleConnue ? null : (estimees[estimees.length >> 1] ?? null);
