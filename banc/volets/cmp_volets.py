@@ -3,7 +3,7 @@
 # reproductible : les images qui ont au moins un volet, melangees par graine, coupees en deux jeux :
 #   volets-dev    : la mise au point (on y regarde, on y regle) ;
 #   volets-final  : tenu a l'ecart (on ne le regarde qu'une fois la version figee).
-# Usage : python3 -I banc/cmp_volets.py <dossier base/ du jeu CMP> <dossier de sortie> [n_dev] [n_final]
+# Usage : python3 -I banc/volets/cmp_volets.py <dossier base/ du jeu CMP> <dossier de sortie> [n_dev] [n_final]
 import re, sys, os, json, glob, random
 import numpy as np
 from PIL import Image
