@@ -185,3 +185,19 @@ Les boîtes de u15 ont été vérifiées sur l'image. Lot total : 15 photos, 140
 Meilleures photos : u7 (9 justes sur 10), u5 (7 sur 14), u15 (6 sur 16). Le temps dépasse le budget du banc
 sur la plupart des photos (0,4 à 2,7 s). La note globale reste à 0 : le groupe `photos` n'a pas de poids
 dans la notation globale.
+
+### Validation croisée sur les photos (trois plis de cinq photos)
+
+Chaque pli de photos est mesuré avec un modèle entraîné sur le CMP de mise au point et sur les deux
+autres plis ; les photos mesurées ne servent jamais à leur propre entraînement.
+
+| Seuil | Rappel | Précision | Justes | Fausses |
+|---|---|---|---|---|
+| 0,60 | 3,6 % | 25,0 % | 5 / 140 | 15 |
+| 0,70 | 3,6 % | 18,5 % | 5 / 140 | 22 |
+| **0,80** | **22,9 %** | **35,2 %** | **32 / 140** | **59** |
+| 0,90 | 2,1 % | 75,0 % | 3 / 140 | 1 |
+
+Comparé à la mesure sans photos à l'entraînement (29 / 140 au seuil 0,80) : **gain négligeable (+3)**.
+Le modèle linéaire sur ces 20 caractéristiques plafonne autour de 21–23 % de rappel. Le seuil reste
+très sensible (de 4 % à 23 % de rappel entre 0,7 et 0,8).
