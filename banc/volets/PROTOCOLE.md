@@ -153,3 +153,8 @@ choisir le seuil, et leur taille est hors plage.
 Ajoutées au même lot, dans le même dossier `banc/volets/photos/`. Droits : supposés identiques à ceux des
 six premières, à confirmer par l'auteur. Lot total : 8 photos, 71 volets, toutes mesurées une seule fois
 ou jamais, aucune pour régler le seuil.
+
+### Photo u9 (polyhabitat.fr, droits confirmés par l'auteur)
+
+Une photo de plus : 8 volets, lot total 79 volets sur 9 photos. Source : polyhabitat.fr, droits
+confirmés par l'auteur du dépôt.

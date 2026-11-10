@@ -562,6 +562,71 @@
      "classe": "volet"
     }
    ]
+  },
+  {
+   "nom": "u9",
+   "fichier": "banc/volets/photos/u9.jpg",
+   "largeur": 1536,
+   "hauteur": 1152,
+   "source": "polyhabitat.fr (droits confirmés par l'auteur)",
+   "gt": [
+    {
+     "x": 108,
+     "y": 284,
+     "l": 53,
+     "h": 146,
+     "classe": "volet"
+    },
+    {
+     "x": 276,
+     "y": 246,
+     "l": 80,
+     "h": 161,
+     "classe": "volet"
+    },
+    {
+     "x": 919,
+     "y": 69,
+     "l": 118,
+     "h": 231,
+     "classe": "volet"
+    },
+    {
+     "x": 1336,
+     "y": 0,
+     "l": 111,
+     "h": 238,
+     "classe": "volet"
+    },
+    {
+     "x": 69,
+     "y": 630,
+     "l": 72,
+     "h": 276,
+     "classe": "volet"
+    },
+    {
+     "x": 233,
+     "y": 630,
+     "l": 93,
+     "h": 361,
+     "classe": "volet"
+    },
+    {
+     "x": 1044,
+     "y": 607,
+     "l": 151,
+     "h": 530,
+     "classe": "volet"
+    },
+    {
+     "x": 1190,
+     "y": 607,
+     "l": 162,
+     "h": 530,
+     "classe": "volet"
+    }
+   ]
   }
  ]
 }
