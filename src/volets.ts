@@ -102,7 +102,7 @@ interface Candidat {
   note: number;
 }
 
-/** Couleur du mur : moyenne du plus fourni des paniers de 32 niveaux par canal. */
+/** Couleur du mur : le centre de la plus forte concentration de teintes (voisinage 3 × 3 × 3 des cases de 32 niveaux), moyenne de ses pixels. */
 function couleurMur(t: Travail): [number, number, number] {
   const n = t.W * t.H;
   const cnt = new Int32Array(512),
@@ -117,10 +117,43 @@ function couleurMur(t: Travail): [number, number, number] {
     sg[k]! += t.g[i]!;
     sb[k]! += t.b[i]!;
   }
-  let m = 0;
-  for (let k = 1; k < 512; k++) if (cnt[k]! > cnt[m]!) m = k;
-  const c = Math.max(1, cnt[m]!);
-  return [sr[m]! / c, sg[m]! / c, sb[m]! / c];
+  let meilleur = -1,
+    m = 0;
+  for (let k = 0; k < 512; k++) {
+    const r0 = k >> 6,
+      g0 = (k >> 3) & 7,
+      b0 = k & 7;
+    let s = 0;
+    for (let dr = -1; dr <= 1; dr++)
+      for (let dg = -1; dg <= 1; dg++)
+        for (let db = -1; db <= 1; db++) {
+          const r1 = r0 + dr,
+            g1 = g0 + dg,
+            b1 = b0 + db;
+          if (r1 < 0 || r1 > 7 || g1 < 0 || g1 > 7 || b1 < 0 || b1 > 7) continue;
+          s += cnt[(r1 << 6) | (g1 << 3) | b1]!;
+        }
+    if (s > meilleur) ((meilleur = s), (m = k));
+  }
+  let a = 0,
+    c = 0,
+    d = 0,
+    q = 0;
+  for (let dr = -1; dr <= 1; dr++)
+    for (let dg = -1; dg <= 1; dg++)
+      for (let db = -1; db <= 1; db++) {
+        const r1 = (m >> 6) + dr,
+          g1 = ((m >> 3) & 7) + dg,
+          b1 = (m & 7) + db;
+        if (r1 < 0 || r1 > 7 || g1 < 0 || g1 > 7 || b1 < 0 || b1 > 7) continue;
+        const k = (r1 << 6) | (g1 << 3) | b1;
+        a += sr[k]!;
+        c += sg[k]!;
+        d += sb[k]!;
+        q += cnt[k]!;
+      }
+  q = Math.max(1, q);
+  return [a / q, c / q, d / q];
 }
 
 /** Classe de teinte et de clarte d'un pixel (0..35). */
