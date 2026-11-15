@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Panoramax : carte à grande échelle</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<style>
+  :root { --fond: #f4f1ea; --texte: #222; --discret: #666; --accent: #2b6e5a; --bord: #d8d2c4; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --fond: #181a1b; --texte: #eee; --discret: #aaa; --accent: #6fc2a6; --bord: #333; } }
+  :root[data-theme="dark"] { --fond: #181a1b; --texte: #eee; --discret: #aaa; --accent: #6fc2a6; --bord: #333; }
+  html, body { margin: 0; height: 100%; background: var(--fond); color: var(--texte); font-family: system-ui, sans-serif; }
+  #carte { position: absolute; inset: 0; }
+  #panneau { position: absolute; left: 0; right: 0; bottom: 0; max-height: 55%; overflow: auto; background: var(--fond); border-top: 1px solid var(--bord); padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; display: none; }
+  #panneau.ouvert { display: block; }
+  #panneau img { max-width: 100%; border-radius: 6px; display: block; }
+  #panneau p { margin: 6px 0; font-size: .9rem; }
+  #panneau .discret { color: var(--discret); font-size: .85rem; }
+  #etat { position: absolute; top: 10px; left: 56px; right: 10px; background: var(--fond); color: var(--texte); border: 1px solid var(--bord); border-radius: 8px; padding: 8px 10px; font-size: .9rem; box-shadow: 0 1px 4px rgba(0,0,0,.2); z-index: 500; }
+  #etat .discret { color: var(--discret); font-size: .8rem; }
+  a { color: var(--accent); }
+  button.fermer { float: right; min-height: 36px; min-width: 36px; border: 1px solid var(--bord); background: var(--fond); color: var(--texte); border-radius: 6px; }
+</style>
+</head>
+<body>
+<div id="carte" role="application" aria-label="Carte des photos Panoramax"></div>
+<div id="etat">
+  <span id="etat-texte">Zoomez à partir du niveau 15 pour afficher les photos.</span>
+  <div class="discret">Photos : Panoramax (CC BY-SA, licence indiquée par photo). Fond : © OpenStreetMap.</div>
+</div>
+<div id="panneau" aria-live="polite">
+  <button class="fermer" type="button" id="fermer" aria-label="Fermer">✕</button>
+  <div id="contenu"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+(function () {
+  'use strict';
+  var API = 'https://api.panoramax.xyz/api/search';
+  var ZOOM_MIN = 15;
+  var LIMITE = 300;
+
+  var carte = L.map('carte', { zoomControl: true, maxZoom: 22, minZoom: 3 }).setView([46.6, 2.5], 6);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxNativeZoom: 19, maxZoom: 22,
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(carte);
+
+  var couche = L.layerGroup().addTo(carte);
+  var etat = document.getElementById('etat-texte');
+  var panneau = document.getElementById('panneau');
+  var contenu = document.getElementById('contenu');
+  var controleur = null;
+  var minuterie = null;
+
+  function echapper(t) {
+    return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function chercher() {
+    clearTimeout(minuterie);
+    minuterie = setTimeout(charger, 400);
+  }
+
+  function charger() {
+    if (carte.getZoom() < ZOOM_MIN) {
+      couche.clearLayers();
+      etat.textContent = 'Zoomez à partir du niveau ' + ZOOM_MIN + ' pour afficher les photos.';
+      return;
+    }
+    var b = carte.getBounds();
+    var bbox = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()].map(function (v) { return v.toFixed(6); }).join(',');
+    if (controleur) controleur.abort();
+    controleur = new AbortController();
+    etat.textContent = 'Recherche des photos…';
+    fetch(API + '?bbox=' + bbox + '&limit=' + LIMITE, { signal: controleur.signal })
+      .then(function (r) { if (!r.ok) throw new Error('API ' + r.status); return r.json(); })
+      .then(function (d) {
+        couche.clearLayers();
+        var feats = d.features || [];
+        feats.forEach(function (f) {
+          var c = f.geometry && f.geometry.coordinates;
+          if (!c) return;
+          var m = L.circleMarker([c[1], c[0]], { radius: 6, color: '#fff', weight: 2, fillColor: '#2b6e5a', fillOpacity: .9 });
+          m.on('click', function () { afficher(f); });
+          couche.addLayer(m);
+        });
+        etat.textContent = feats.length + ' photo(s) dans cette zone' +
+          (feats.length >= LIMITE ? ' (limite atteinte : zoomez pour voir les autres)' : '') + '.';
+      })
+      .catch(function (e) {
+        if (e.name === 'AbortError') return;
+        etat.textContent = 'Impossible de charger les photos (' + e.message + ').';
+      });
+  }
+
+  function afficher(f) {
+    var p = f.properties || {};
+    var a = f.assets || {};
+    var sd = a.sd ? a.sd.href : (a.thumb ? a.thumb.href : '');
+    var hd = a.hd ? a.hd.href : '';
+    var c = f.geometry.coordinates;
+    var date = p.datetime ? new Date(p.datetime).toLocaleString('fr-FR') : '';
+    var page = 'https://panoramax.openstreetmap.fr/#focus=pic&pic=' + encodeURIComponent(f.id);
+    contenu.innerHTML =
+      (sd ? '<img src="' + echapper(sd) + '" alt="Photo Panoramax ' + echapper(f.id) + '">' : '') +
+      '<p><strong>' + echapper(date) + '</strong></p>' +
+      '<p class="discret">Position : ' + c[1].toFixed(6) + ', ' + c[0].toFixed(6) + '</p>' +
+      '<p class="discret">Licence : ' + echapper(f.license || p.license || 'non précisée') + '</p>' +
+      '<p>' +
+        (hd ? '<a href="' + echapper(hd) + '" target="_blank" rel="noopener">Photo haute résolution</a> · ' : '') +
+        '<a href="' + echapper(page) + '" target="_blank" rel="noopener">Voir sur Panoramax</a>' +
+      '</p>';
+    panneau.classList.add('ouvert');
+  }
+
+  document.getElementById('fermer').addEventListener('click', function () { panneau.classList.remove('ouvert'); });
+  carte.on('moveend', chercher);
+  chercher();
+})();
+</script>
+</body>
+</html>
