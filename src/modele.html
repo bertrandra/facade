@@ -41,6 +41,8 @@ body {
 /*DOC*/
 header { padding: 18px 0 6px; max-width: 760px; margin: 0 auto; }
 h1 { font-size: 1.35rem; margin: 0 0 4px; }
+.retour-carte { min-height: 40px; margin: 0 0 10px; padding: 6px 14px; }
+.retour-carte[hidden] { display: none; }
 header p { margin: 0; color: var(--discret); font-size: .92rem; }
 main { max-width: 760px; margin: 0 auto; padding: 8px 0 40px; display: grid; gap: 14px; }
 section { background: var(--carte); border: 1px solid var(--bord); border-radius: 14px; padding: 14px 16px 16px; min-width: 0; }
@@ -136,6 +138,7 @@ footer { text-align: center; color: var(--discret); font-size: .78rem; padding: 
 </head>
 <body>
 <header>
+  <button type="button" class="second retour-carte" id="retour-carte" hidden>← Revenir à la carte</button>
   <h1>Façade redressée</h1>
   <p>Photographiez la façade, la page fait le reste : elle lit l’objectif dans la photo, redresse la perspective et assemble vos photos, à leur pleine résolution. Tout se calcule sur le téléphone ; aucune image ne le quitte.</p>
 </header>

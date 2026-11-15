@@ -1373,13 +1373,24 @@ async function partager() {
 
 function demarrer() {
   // Photo envoyee par la carte Panoramax : la page signale qu'elle est prete, l'ouvreur repond avec la photo.
+  // Retour a la carte : la carte s'appelle « carte » ; on la rouvre a sa derniere position.
+  let retourCarte = 'panoramax.html';
+  const montrerRetour = () => ($('retour-carte').hidden = false);
+  $('retour-carte').addEventListener('click', () => {
+    window.open(retourCarte, 'carte');
+  });
   window.addEventListener('message', (e) => {
-    const d = e.data as { type?: string; blob?: Blob; nom?: string } | null;
+    const d = e.data as { type?: string; blob?: Blob; nom?: string; carte?: string } | null;
     if (!d || d.type !== 'facade-photo' || !(d.blob instanceof Blob) || (window.opener && e.source !== window.opener)) return;
+    if (typeof d.carte === 'string' && /^(https?|file):\/\/[^\s]*panoramax\.html(#[\d./-]*)?$/.test(d.carte)) retourCarte = d.carte;
+    montrerRetour();
     const f = new File([d.blob], d.nom || 'panoramax.jpg', { type: d.blob.type || 'image/jpeg' });
     void ajouter([f], 'Panoramax');
   });
-  if (window.opener) window.opener.postMessage({ type: 'facade-pret' }, '*');
+  if (window.opener) {
+    montrerRetour();
+    window.opener.postMessage({ type: 'facade-pret' }, '*');
+  }
   for (const id of ['prendre', 'importer']) {
     const input = $<HTMLInputElement>(id);
     input.addEventListener('click', () => journal(`bouton « ${id === 'prendre' ? 'Prendre une photo' : 'Importer'} » touché`));
