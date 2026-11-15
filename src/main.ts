@@ -1372,6 +1372,14 @@ async function partager() {
 /* ---------- demarrage ---------- */
 
 function demarrer() {
+  // Photo envoyee par la carte Panoramax : la page signale qu'elle est prete, l'ouvreur repond avec la photo.
+  window.addEventListener('message', (e) => {
+    const d = e.data as { type?: string; blob?: Blob; nom?: string } | null;
+    if (!d || d.type !== 'facade-photo' || !(d.blob instanceof Blob) || (window.opener && e.source !== window.opener)) return;
+    const f = new File([d.blob], d.nom || 'panoramax.jpg', { type: d.blob.type || 'image/jpeg' });
+    void ajouter([f], 'Panoramax');
+  });
+  if (window.opener) window.opener.postMessage({ type: 'facade-pret' }, '*');
   for (const id of ['prendre', 'importer']) {
     const input = $<HTMLInputElement>(id);
     input.addEventListener('click', () => journal(`bouton « ${id === 'prendre' ? 'Prendre une photo' : 'Importer'} » touché`));

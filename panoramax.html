@@ -19,6 +19,8 @@
   #etat { position: absolute; top: 10px; left: 56px; right: 10px; background: var(--fond); color: var(--texte); border: 1px solid var(--bord); border-radius: 8px; padding: 8px 10px; font-size: .9rem; box-shadow: 0 1px 4px rgba(0,0,0,.2); z-index: 500; }
   #etat .discret { color: var(--discret); font-size: .8rem; }
   a { color: var(--accent); }
+  button.envoyer { min-height: 40px; padding: 6px 12px; border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 6px; font-size: .95rem; }
+  button.envoyer:disabled { opacity: .6; }
   button.fermer { float: right; min-height: 36px; min-width: 36px; border: 1px solid var(--bord); background: var(--fond); color: var(--texte); border-radius: 6px; }
 </style>
 </head>
@@ -96,6 +98,41 @@
       });
   }
 
+  var envoiEnCours = null;
+
+  // Ouvre la page facade tout de suite (geste de l'utilisateur), puis lui envoie la photo HD
+  // quand elle signale qu'elle est prete.
+  function envoyerAFacade(f) {
+    var a = f.assets || {};
+    var source = a.hd ? a.hd.href : (a.sd ? a.sd.href : '');
+    if (!source) return;
+    var w = window.open('facade.html', 'facade');
+    var bouton = document.getElementById('envoyer');
+    if (!w) { bouton.textContent = 'Fenêtre bloquée : autorisez les fenêtres pour ce site'; return; }
+    bouton.disabled = true;
+    bouton.textContent = 'Envoi vers la page façade…';
+    envoiEnCours = { fenetre: w, source: source, nom: (f.id || 'panoramax') + '.jpg', fait: false };
+  }
+
+  window.addEventListener('message', function (e) {
+    if (!envoiEnCours || e.source !== envoiEnCours.fenetre || envoiEnCours.fait) return;
+    if (!e.data || e.data.type !== 'facade-pret') return;
+    envoiEnCours.fait = true;
+    fetch(envoiEnCours.source)
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); })
+      .then(function (blob) {
+        envoiEnCours.fenetre.postMessage({ type: 'facade-photo', blob: blob, nom: envoiEnCours.nom }, '*');
+        var bouton = document.getElementById('envoyer');
+        bouton.disabled = false;
+        bouton.textContent = 'Photo envoyée à la page façade';
+      })
+      .catch(function (err) {
+        var bouton = document.getElementById('envoyer');
+        bouton.disabled = false;
+        bouton.textContent = 'Échec de l’envoi (' + err.message + ')';
+      });
+  });
+
   function afficher(f) {
     var p = f.properties || {};
     var a = f.assets || {};
@@ -112,7 +149,9 @@
       '<p>' +
         (hd ? '<a href="' + echapper(hd) + '" target="_blank" rel="noopener">Photo haute résolution</a> · ' : '') +
         '<a href="' + echapper(page) + '" target="_blank" rel="noopener">Voir sur Panoramax</a>' +
-      '</p>';
+      '</p>' +
+      '<p><button type="button" id="envoyer" class="envoyer">Ouvrir cette photo dans la page façade</button></p>';
+    document.getElementById('envoyer').addEventListener('click', function () { envoyerAFacade(f); });
     panneau.classList.add('ouvert');
   }
 
