@@ -3,161 +3,410 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Panoramax : carte à grande échelle</title>
+<title>Panoramax Façades</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
 <style>
-  :root { --fond: #f4f1ea; --texte: #222; --discret: #666; --accent: #2b6e5a; --bord: #d8d2c4; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --fond: #181a1b; --texte: #eee; --discret: #aaa; --accent: #6fc2a6; --bord: #333; } }
-  :root[data-theme="dark"] { --fond: #181a1b; --texte: #eee; --discret: #aaa; --accent: #6fc2a6; --bord: #333; }
-  html, body { margin: 0; height: 100%; background: var(--fond); color: var(--texte); font-family: system-ui, sans-serif; }
-  #carte { position: absolute; inset: 0; }
-  #panneau { position: absolute; left: 0; right: 0; bottom: 0; max-height: 55%; overflow: auto; background: var(--fond); border-top: 1px solid var(--bord); padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; display: none; }
-  #panneau.ouvert { display: block; }
-  #panneau img { max-width: 100%; border-radius: 6px; display: block; }
-  #panneau p { margin: 6px 0; font-size: .9rem; }
-  #panneau .discret { color: var(--discret); font-size: .85rem; }
-  #etat { position: absolute; top: 10px; left: 56px; right: 10px; background: var(--fond); color: var(--texte); border: 1px solid var(--bord); border-radius: 8px; padding: 8px 10px; font-size: .9rem; box-shadow: 0 1px 4px rgba(0,0,0,.2); z-index: 500; }
-  #etat .discret { color: var(--discret); font-size: .8rem; }
+  :root {
+    --fond: #f5f2ec; --surface: #ffffff; --surface-2: #f0ece4; --texte: #1d1f1e; --discret: #6b6f6c;
+    --bord: #e2ddd2; --accent: #1f6f5c; --accent-texte: #ffffff; --accent-doux: #dcefe8;
+    --recent: #1f6f5c; --moyen: #c98a1b; --ancien: #8a8f8c; --selection: #e8402b;
+    --ombre: 0 8px 28px rgba(20, 24, 22, .16), 0 1px 3px rgba(20, 24, 22, .12);
+    --rayon: 14px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --fond: #121413; --surface: #1b1e1d; --surface-2: #232726; --texte: #eceeed; --discret: #a3a8a5;
+      --bord: #2f3432; --accent: #5cc4a6; --accent-texte: #0d1a16; --accent-doux: #173a31;
+      --recent: #5cc4a6; --moyen: #e2a840; --ancien: #8d9390; --selection: #ff6a52;
+      --ombre: 0 8px 28px rgba(0, 0, 0, .5), 0 1px 3px rgba(0, 0, 0, .4);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --fond: #121413; --surface: #1b1e1d; --surface-2: #232726; --texte: #eceeed; --discret: #a3a8a5;
+    --bord: #2f3432; --accent: #5cc4a6; --accent-texte: #0d1a16; --accent-doux: #173a31;
+    --recent: #5cc4a6; --moyen: #e2a840; --ancien: #8d9390; --selection: #ff6a52;
+    --ombre: 0 8px 28px rgba(0, 0, 0, .5), 0 1px 3px rgba(0, 0, 0, .4);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--fond); color: var(--texte);
+    font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+  button, input { font: inherit; color: inherit; }
   a { color: var(--accent); }
-  button.envoyer { min-height: 40px; padding: 6px 12px; border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 6px; font-size: .95rem; }
-  button.envoyer:disabled { opacity: .6; }
-  button.fermer { float: right; min-height: 36px; min-width: 36px; border: 1px solid var(--bord); background: var(--fond); color: var(--texte); border-radius: 6px; }
+
+  /* Barre du haut */
+  #barre { position: absolute; top: 0; left: 0; right: 0; z-index: 800; display: flex; gap: 10px; align-items: center;
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px; pointer-events: none; }
+  #barre > * { pointer-events: auto; }
+  .marque { display: flex; align-items: center; gap: 8px; background: var(--surface); border-radius: 999px; padding: 8px 14px 8px 10px;
+    box-shadow: var(--ombre); font-weight: 650; white-space: nowrap; }
+  .marque svg { width: 22px; height: 22px; color: var(--accent); }
+  .marque small { font-weight: 500; color: var(--discret); }
+  #recherche { flex: 1; min-width: 0; max-width: 460px; display: flex; background: var(--surface); border-radius: 999px; box-shadow: var(--ombre); overflow: hidden; }
+  #recherche input { flex: 1; min-width: 0; border: 0; background: transparent; padding: 10px 14px; outline: none; }
+  #recherche button { border: 0; background: transparent; padding: 0 14px; cursor: pointer; color: var(--discret); }
+  .rond { width: 42px; height: 42px; flex: none; border: 0; border-radius: 50%; background: var(--surface); box-shadow: var(--ombre);
+    display: grid; place-items: center; cursor: pointer; color: var(--texte); }
+  .rond svg { width: 20px; height: 20px; }
+  .rond:focus-visible, #recherche:focus-within, .bouton:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  #carte { position: absolute; inset: 0; background: var(--surface-2); }
+  /* Controles de la carte : sous la barre (en haut a gauche) et sous le panneau. */
+  .leaflet-top, .leaflet-bottom { z-index: 600 !important; }
+  .leaflet-top.leaflet-left { top: calc(64px + env(safe-area-inset-top, 0px)); }
+  .leaflet-control-zoom { border: 0 !important; box-shadow: var(--ombre) !important; border-radius: 12px !important; overflow: hidden; }
+  .leaflet-control-zoom a { background: var(--surface) !important; color: var(--texte) !important; border-color: var(--bord) !important; width: 40px !important; height: 40px !important; line-height: 40px !important; }
+  .leaflet-bottom.leaflet-right .leaflet-control-attribution { background: color-mix(in srgb, var(--surface) 85%, transparent); color: var(--discret); border-radius: 8px 0 0 0; }
+  .leaflet-control-attribution a { color: var(--accent); }
+
+  /* Etat et legende */
+  #etat { position: absolute; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 700; background: var(--surface);
+    border-radius: 12px; box-shadow: var(--ombre); padding: 10px 14px; max-width: calc(100% - 32px); font-size: 14px; }
+  #etat .ligne { display: flex; align-items: center; gap: 8px; }
+  #etat .legende { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; color: var(--discret); font-size: 12.5px; }
+  #etat .legende span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; background: var(--c); border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--bord); }
+  .roue { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--accent-doux); border-top-color: var(--accent); animation: tourne .8s linear infinite; display: none; }
+  .charge .roue { display: inline-block; }
+  @keyframes tourne { to { transform: rotate(360deg); } }
+
+  /* Invitation a zoomer */
+  #zoomer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 650; background: var(--surface); border-radius: var(--rayon);
+    box-shadow: var(--ombre); padding: 18px 20px; text-align: center; max-width: min(320px, calc(100% - 32px)); }
+  #zoomer[hidden] { display: none; }
+  #zoomer p { margin: 0 0 12px; color: var(--discret); }
+  #zoomer strong { display: block; color: var(--texte); font-size: 16px; margin-bottom: 4px; }
+
+  .bouton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 16px; border-radius: 10px;
+    border: 1px solid var(--bord); background: var(--surface); cursor: pointer; text-decoration: none; color: var(--texte); font-weight: 560; }
+  .bouton.primaire { background: var(--accent); border-color: var(--accent); color: var(--accent-texte); }
+  .bouton:disabled { opacity: .55; cursor: default; }
+  .bouton svg { width: 18px; height: 18px; }
+
+  /* Panneau de detail : tiroir a droite (grand ecran), feuille en bas (telephone) */
+  #panneau { position: absolute; z-index: 900; background: var(--surface); box-shadow: var(--ombre); display: flex; flex-direction: column;
+    transition: transform .25s ease; overflow: hidden; }
+  #panneau[hidden] { display: none; }
+  @media (min-width: 860px) {
+    #panneau { top: 72px; right: 16px; bottom: 16px; width: 400px; border-radius: var(--rayon); }
+  }
+  @media (max-width: 859px) {
+    #panneau { left: 0; right: 0; bottom: 0; max-height: 68vh; border-radius: var(--rayon) var(--rayon) 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+    #panneau::before { content: ""; display: block; width: 40px; height: 4px; border-radius: 4px; background: var(--bord); margin: 8px auto 0; flex: none; }
+  }
+  .tete { display: flex; align-items: center; gap: 8px; padding: 12px 12px 8px 16px; }
+  .tete h2 { margin: 0; font-size: 16px; flex: 1; }
+  .defile { overflow: auto; padding: 0 16px 16px; }
+  .photo { position: relative; border-radius: 12px; overflow: hidden; background: var(--surface-2); aspect-ratio: 4 / 3; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .2s; }
+  .photo img.charge { opacity: 0; }
+  .photo .boussole { position: absolute; right: 10px; top: 10px; background: rgba(0,0,0,.55); color: #fff; border-radius: 999px; padding: 4px 10px; font-size: 12.5px; display: flex; gap: 6px; align-items: center; }
+  .photo .boussole svg { width: 14px; height: 14px; }
+  .sequence { display: flex; gap: 8px; margin: 10px 0 4px; }
+  .sequence .bouton { flex: 1; }
+  .meta { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 14px 0; font-size: 14px; }
+  .meta dt { color: var(--discret); }
+  .meta dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; background: var(--accent-doux); color: var(--accent); font-size: 12.5px; font-weight: 600; }
+  .actions { display: grid; gap: 8px; }
+  .actions .ligne { display: flex; gap: 8px; }
+  .actions .ligne .bouton { flex: 1; }
+  .note { color: var(--discret); font-size: 12.5px; margin-top: 10px; }
+  .copier { border: 0; background: none; padding: 0 0 0 6px; color: var(--accent); cursor: pointer; font-size: 13px; }
+
+  /* Message bref */
+  #toast { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(90px + env(safe-area-inset-bottom, 0px)); z-index: 1000;
+    background: var(--texte); color: var(--fond); padding: 10px 16px; border-radius: 10px; font-size: 14px; box-shadow: var(--ombre); max-width: calc(100% - 32px); }
+  #toast[hidden] { display: none; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  @media (max-width: 520px) { .marque small { display: none; } .marque { padding: 8px 12px 8px 10px; } }
 </style>
 </head>
 <body>
 <div id="carte" role="application" aria-label="Carte des photos Panoramax"></div>
-<div id="etat">
-  <span id="etat-texte">Zoomez à partir du niveau 15 pour afficher les photos.</span>
-  <div class="discret">Photos : Panoramax (CC BY-SA, licence indiquée par photo). Fond : © OpenStreetMap.</div>
+
+<header id="barre">
+  <div class="marque" aria-label="Panoramax Façades">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10l9-6 9 6v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+    <span>Façades <small>· Panoramax</small></span>
+  </div>
+  <form id="recherche" role="search">
+    <label for="lieu" class="sr">Rechercher un lieu</label>
+    <input id="lieu" type="search" placeholder="Adresse, ville…" autocomplete="off">
+    <button type="submit" aria-label="Rechercher">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    </button>
+  </form>
+  <button class="rond" id="position" type="button" aria-label="Me localiser" title="Me localiser">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
+  </button>
+</header>
+
+<div id="zoomer">
+  <strong>Zoomez sur une rue</strong>
+  <p>Les photos Panoramax s’affichent à partir du niveau de zoom 15.</p>
+  <button class="bouton primaire" id="zoomer-ici" type="button">Zoomer ici</button>
 </div>
-<div id="panneau" aria-live="polite">
-  <button class="fermer" type="button" id="fermer" aria-label="Fermer">✕</button>
-  <div id="contenu"></div>
+
+<div id="etat" aria-live="polite">
+  <div class="ligne"><span class="roue" aria-hidden="true"></span><span id="etat-texte">Prêt.</span></div>
+  <div class="legende"><span style="--c: var(--recent)">moins d’un an</span><span style="--c: var(--moyen)">1 à 3 ans</span><span style="--c: var(--ancien)">plus ancien</span></div>
 </div>
+
+<aside id="panneau" hidden aria-labelledby="titre-photo">
+  <div class="tete">
+    <h2 id="titre-photo">Photo</h2>
+    <button class="rond" id="fermer" type="button" aria-label="Fermer" style="width:36px;height:36px;box-shadow:none;background:var(--surface-2)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="defile" id="contenu"></div>
+</aside>
+
+<div id="toast" hidden role="status"></div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 (function () {
   'use strict';
-  var API = 'https://api.panoramax.xyz/api/search';
-  var ZOOM_MIN = 15;
-  var LIMITE = 300;
+  var API = 'https://api.panoramax.xyz/api';
+  var ZOOM_MIN = 15, LIMITE = 300;
+  var $ = function (id) { return document.getElementById(id); };
+  var css = function (v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); };
 
-  var carte = L.map('carte', { zoomControl: true, maxZoom: 22, minZoom: 3 }).setView([46.6, 2.5], 6);
+  // Vue initiale : l'adresse (#zoom/lat/lon) si elle en porte une, sinon la France.
+  var vue = (location.hash.match(/^#(\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)/) || []);
+  var carte = L.map('carte', { zoomControl: false, maxZoom: 22, minZoom: 3, attributionControl: true });
+  if (vue.length) carte.setView([+vue[2], +vue[3]], +vue[1]); else carte.setView([46.6, 2.5], 6);
+  L.control.zoom({ position: 'topleft' }).addTo(carte);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxNativeZoom: 19, maxZoom: 22,
-    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    attribution: 'Fond © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Photos <a href="https://panoramax.fr">Panoramax</a>'
   }).addTo(carte);
 
-  var couche = L.layerGroup().addTo(carte);
-  var etat = document.getElementById('etat-texte');
-  var panneau = document.getElementById('panneau');
-  var contenu = document.getElementById('contenu');
-  var controleur = null;
-  var minuterie = null;
+  var points = L.layerGroup().addTo(carte);
+  var cones = L.layerGroup().addTo(carte);
+  var selection = L.layerGroup().addTo(carte);
+  var controleur = null, minuterie = null, courante = null, envoi = null;
 
   function echapper(t) {
-    return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
+    return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
+  }
+  function toast(t) {
+    var e = $('toast'); e.textContent = t; e.hidden = false;
+    clearTimeout(toast.m); toast.m = setTimeout(function () { e.hidden = true; }, 2600);
+  }
+  function age(f) {
+    var d = f.properties && f.properties.datetime ? new Date(f.properties.datetime) : null;
+    if (!d) return 'ancien';
+    var ans = (Date.now() - d.getTime()) / 31557600000;
+    return ans < 1 ? 'recent' : ans < 3 ? 'moyen' : 'ancien';
+  }
+  function couleur(f) { return css('--' + age(f)); }
+  function depuis(d) {
+    var j = Math.round((Date.now() - d.getTime()) / 86400000);
+    if (j < 1) return 'aujourd’hui';
+    if (j < 45) return 'il y a ' + j + ' jour' + (j > 1 ? 's' : '');
+    var m = Math.round(j / 30.4);
+    if (m < 18) return 'il y a ' + m + ' mois';
+    return 'il y a ' + Math.round(j / 365.25) + ' ans';
+  }
+  function direction(az) {
+    var noms = ['nord', 'nord-est', 'est', 'sud-est', 'sud', 'sud-ouest', 'ouest', 'nord-ouest'];
+    return noms[Math.round(((az % 360) + 360) % 360 / 45) % 8];
+  }
+  // Cone de vue : 50 degres d'ouverture, longueur en metres selon le zoom.
+  function cone(lat, lon, az, longueur) {
+    var pts = [[lat, lon]];
+    for (var a = -25; a <= 25; a += 5) {
+      var t = (az + a) * Math.PI / 180;
+      pts.push([lat + longueur * Math.cos(t) / 111320, lon + longueur * Math.sin(t) / (111320 * Math.cos(lat * Math.PI / 180))]);
+    }
+    return pts;
   }
 
-  function chercher() {
-    clearTimeout(minuterie);
-    minuterie = setTimeout(charger, 400);
+  function memoriserVue() {
+    var c = carte.getCenter();
+    history.replaceState(null, '', '#' + carte.getZoom() + '/' + c.lat.toFixed(5) + '/' + c.lng.toFixed(5));
   }
 
   function charger() {
-    if (carte.getZoom() < ZOOM_MIN) {
-      couche.clearLayers();
-      etat.textContent = 'Zoomez à partir du niveau ' + ZOOM_MIN + ' pour afficher les photos.';
+    memoriserVue();
+    var z = carte.getZoom();
+    $('zoomer').hidden = z >= ZOOM_MIN;
+    if (z < ZOOM_MIN) {
+      points.clearLayers(); cones.clearLayers();
+      $('etat-texte').textContent = 'Zoomez pour voir les photos.';
       return;
     }
     var b = carte.getBounds();
     var bbox = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()].map(function (v) { return v.toFixed(6); }).join(',');
     if (controleur) controleur.abort();
     controleur = new AbortController();
-    etat.textContent = 'Recherche des photos…';
-    fetch(API + '?bbox=' + bbox + '&limit=' + LIMITE, { signal: controleur.signal })
+    $('etat').classList.add('charge');
+    $('etat-texte').textContent = 'Recherche des photos…';
+    fetch(API + '/search?bbox=' + bbox + '&limit=' + LIMITE, { signal: controleur.signal })
       .then(function (r) { if (!r.ok) throw new Error('API ' + r.status); return r.json(); })
       .then(function (d) {
-        couche.clearLayers();
+        points.clearLayers(); cones.clearLayers();
         var feats = d.features || [];
+        var rayon = z >= 19 ? 7 : z >= 17 ? 6 : 5;
+        var longueur = z >= 20 ? 6 : z >= 18 ? 12 : 0;
         feats.forEach(function (f) {
           var c = f.geometry && f.geometry.coordinates;
           if (!c) return;
-          var m = L.circleMarker([c[1], c[0]], { radius: 6, color: '#fff', weight: 2, fillColor: '#2b6e5a', fillOpacity: .9 });
-          m.on('click', function () { afficher(f); });
-          couche.addLayer(m);
+          var az = f.properties && f.properties['view:azimuth'];
+          if (longueur && typeof az === 'number') {
+            cones.addLayer(L.polygon(cone(c[1], c[0], az, longueur), { stroke: false, fillColor: couleur(f), fillOpacity: .22, interactive: false }));
+          }
+          var m = L.circleMarker([c[1], c[0]], { radius: rayon, color: css('--surface'), weight: 2, fillColor: couleur(f), fillOpacity: 1 });
+          m.bindTooltip(f.properties && f.properties.datetime ? new Date(f.properties.datetime).toLocaleDateString('fr-FR') : 'Photo', { direction: 'top', offset: [0, -6] });
+          m.on('click', function () { ouvrir(f, false); });
+          points.addLayer(m);
         });
-        etat.textContent = feats.length + ' photo(s) dans cette zone' +
-          (feats.length >= LIMITE ? ' (limite atteinte : zoomez pour voir les autres)' : '') + '.';
+        $('etat-texte').textContent = feats.length
+          ? feats.length + ' photo' + (feats.length > 1 ? 's' : '') + (feats.length >= LIMITE ? ' (zoomez pour en voir plus)' : '')
+          : 'Aucune photo dans cette zone.';
       })
-      .catch(function (e) {
-        if (e.name === 'AbortError') return;
-        etat.textContent = 'Impossible de charger les photos (' + e.message + ').';
-      });
+      .catch(function (e) { if (e.name !== 'AbortError') $('etat-texte').textContent = 'Photos indisponibles (' + e.message + ').'; })
+      .finally(function () { $('etat').classList.remove('charge'); });
+  }
+  function chercher() { clearTimeout(minuterie); minuterie = setTimeout(charger, 350); }
+
+  function lien(f, rel) {
+    var l = (f.links || []).filter(function (x) { return x.rel === rel; })[0];
+    return l ? l.href : null;
   }
 
-  var envoiEnCours = null;
+  function marquer(f) {
+    selection.clearLayers();
+    var c = f.geometry.coordinates, az = f.properties && f.properties['view:azimuth'];
+    if (typeof az === 'number') selection.addLayer(L.polygon(cone(c[1], c[0], az, 14), { stroke: false, fillColor: css('--selection'), fillOpacity: .3, interactive: false }));
+    selection.addLayer(L.circleMarker([c[1], c[0]], { radius: 9, color: css('--surface'), weight: 3, fillColor: css('--selection'), fillOpacity: 1, interactive: false }));
+  }
 
-  // Ouvre la page facade tout de suite (geste de l'utilisateur), puis lui envoie la photo HD
-  // quand elle signale qu'elle est prete.
+  function ouvrir(f, centrer) {
+    courante = f;
+    marquer(f);
+    var p = f.properties || {}, a = f.assets || {}, c = f.geometry.coordinates;
+    var sd = a.sd ? a.sd.href : (a.thumb ? a.thumb.href : ''), hd = a.hd ? a.hd.href : '';
+    var d = p.datetime ? new Date(p.datetime) : null;
+    var az = p['view:azimuth'];
+    var auteur = ((f.providers || p.providers || []).filter(function (x) { return (x.roles || []).indexOf('producer') >= 0; })[0] || {}).name || p['geovisio:producer'] || 'non indiqué';
+    var licence = f.license || p.license || 'non précisée';
+    var page = 'https://panoramax.openstreetmap.fr/#focus=pic&pic=' + encodeURIComponent(f.id);
+    $('titre-photo').textContent = d ? d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Photo';
+    $('contenu').innerHTML =
+      '<div class="photo">' +
+        (sd ? '<img class="charge" src="' + echapper(sd) + '" alt="Photo Panoramax du ' + echapper(d ? d.toLocaleDateString('fr-FR') : '') + '">' : '') +
+        (typeof az === 'number' ? '<span class="boussole"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="transform:rotate(' + az + 'deg)"><path d="M12 2l5 14-5-3-5 3z"/></svg>' + direction(az) + ' · ' + Math.round(az) + '°</span>' : '') +
+      '</div>' +
+      '<div class="sequence">' +
+        '<button class="bouton" id="precedente" type="button"' + (lien(f, 'prev') ? '' : ' disabled') + ' aria-label="Photo précédente dans la séquence">◀ Précédente</button>' +
+        '<button class="bouton" id="suivante" type="button"' + (lien(f, 'next') ? '' : ' disabled') + ' aria-label="Photo suivante dans la séquence">Suivante ▶</button>' +
+      '</div>' +
+      '<dl class="meta">' +
+        '<dt>Prise</dt><dd>' + (d ? echapper(d.toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' })) + ' · ' + depuis(d) : 'date inconnue') + '</dd>' +
+        '<dt>Auteur</dt><dd>' + echapper(auteur) + '</dd>' +
+        '<dt>Licence</dt><dd><span class="badge">' + echapper(licence) + '</span></dd>' +
+        '<dt>Position</dt><dd>' + c[1].toFixed(6) + ', ' + c[0].toFixed(6) + '<button class="copier" id="copier" type="button">Copier</button></dd>' +
+      '</dl>' +
+      '<div class="actions">' +
+        '<button class="bouton primaire" id="envoyer" type="button">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10l9-6 9 6v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>' +
+          'Ouvrir dans la page façade</button>' +
+        '<div class="ligne">' +
+          (hd ? '<a class="bouton" href="' + echapper(hd) + '" target="_blank" rel="noopener">Photo HD</a>' : '') +
+          '<a class="bouton" href="' + echapper(page) + '" target="_blank" rel="noopener">Panoramax ↗</a>' +
+        '</div>' +
+      '</div>' +
+      '<p class="note">Respectez la licence de la photo et citez son auteur si vous la réutilisez.</p>';
+    var img = $('contenu').querySelector('img');
+    if (img) img.addEventListener('load', function () { img.classList.remove('charge'); });
+    $('envoyer').addEventListener('click', function () { envoyerAFacade(f); });
+    $('copier').addEventListener('click', function () {
+      var t = c[1].toFixed(6) + ', ' + c[0].toFixed(6);
+      (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { toast('Position copiée'); }, function () { toast(t); });
+    });
+    $('precedente').addEventListener('click', function () { voisine('prev'); });
+    $('suivante').addEventListener('click', function () { voisine('next'); });
+    $('panneau').hidden = false;
+    if (centrer) carte.panTo([c[1], c[0]], { animate: true });
+  }
+
+  function voisine(rel) {
+    var url = courante && lien(courante, rel);
+    if (!url) return;
+    $('etat').classList.add('charge');
+    fetch(url).then(function (r) { if (!r.ok) throw new Error('API ' + r.status); return r.json(); })
+      .then(function (f) { ouvrir(f, true); })
+      .catch(function (e) { toast('Photo voisine indisponible (' + e.message + ')'); })
+      .finally(function () { $('etat').classList.remove('charge'); });
+  }
+
+  function fermer() { $('panneau').hidden = true; selection.clearLayers(); courante = null; }
+
+  // Envoi vers la page facade : on ouvre la fenetre tout de suite (geste de l'utilisateur),
+  // puis on envoie la photo HD quand elle signale qu'elle est prete.
   function envoyerAFacade(f) {
     var a = f.assets || {};
     var source = a.hd ? a.hd.href : (a.sd ? a.sd.href : '');
     if (!source) return;
     var w = window.open('facade.html', 'facade');
-    var bouton = document.getElementById('envoyer');
-    if (!w) { bouton.textContent = 'Fenêtre bloquée : autorisez les fenêtres pour ce site'; return; }
-    bouton.disabled = true;
-    bouton.textContent = 'Envoi vers la page façade…';
-    envoiEnCours = { fenetre: w, source: source, nom: (f.id || 'panoramax') + '.jpg', fait: false };
+    var b = $('envoyer');
+    if (!w) { toast('Fenêtre bloquée : autorisez les fenêtres pour ce site.'); return; }
+    b.disabled = true;
+    b.lastChild.textContent = 'Envoi vers la page façade…';
+    envoi = { fenetre: w, source: source, nom: (f.id || 'panoramax') + '.jpg', fait: false };
   }
-
   window.addEventListener('message', function (e) {
-    if (!envoiEnCours || e.source !== envoiEnCours.fenetre || envoiEnCours.fait) return;
-    if (!e.data || e.data.type !== 'facade-pret') return;
-    envoiEnCours.fait = true;
-    fetch(envoiEnCours.source)
+    if (!envoi || e.source !== envoi.fenetre || envoi.fait || !e.data || e.data.type !== 'facade-pret') return;
+    envoi.fait = true;
+    fetch(envoi.source)
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); })
       .then(function (blob) {
-        envoiEnCours.fenetre.postMessage({ type: 'facade-photo', blob: blob, nom: envoiEnCours.nom }, '*');
-        var bouton = document.getElementById('envoyer');
-        bouton.disabled = false;
-        bouton.textContent = 'Photo envoyée à la page façade';
+        envoi.fenetre.postMessage({ type: 'facade-photo', blob: blob, nom: envoi.nom }, '*');
+        var b = $('envoyer'); if (b) { b.disabled = false; b.lastChild.textContent = 'Photo envoyée à la page façade'; }
+        toast('Photo envoyée à la page façade');
       })
       .catch(function (err) {
-        var bouton = document.getElementById('envoyer');
-        bouton.disabled = false;
-        bouton.textContent = 'Échec de l’envoi (' + err.message + ')';
+        var b = $('envoyer'); if (b) { b.disabled = false; b.lastChild.textContent = 'Ouvrir dans la page façade'; }
+        toast('Échec de l’envoi (' + err.message + ')');
       });
   });
 
-  function afficher(f) {
-    var p = f.properties || {};
-    var a = f.assets || {};
-    var sd = a.sd ? a.sd.href : (a.thumb ? a.thumb.href : '');
-    var hd = a.hd ? a.hd.href : '';
-    var c = f.geometry.coordinates;
-    var date = p.datetime ? new Date(p.datetime).toLocaleString('fr-FR') : '';
-    var page = 'https://panoramax.openstreetmap.fr/#focus=pic&pic=' + encodeURIComponent(f.id);
-    contenu.innerHTML =
-      (sd ? '<img src="' + echapper(sd) + '" alt="Photo Panoramax ' + echapper(f.id) + '">' : '') +
-      '<p><strong>' + echapper(date) + '</strong></p>' +
-      '<p class="discret">Position : ' + c[1].toFixed(6) + ', ' + c[0].toFixed(6) + '</p>' +
-      '<p class="discret">Licence : ' + echapper(f.license || p.license || 'non précisée') + '</p>' +
-      '<p>' +
-        (hd ? '<a href="' + echapper(hd) + '" target="_blank" rel="noopener">Photo haute résolution</a> · ' : '') +
-        '<a href="' + echapper(page) + '" target="_blank" rel="noopener">Voir sur Panoramax</a>' +
-      '</p>' +
-      '<p><button type="button" id="envoyer" class="envoyer">Ouvrir cette photo dans la page façade</button></p>';
-    document.getElementById('envoyer').addEventListener('click', function () { envoyerAFacade(f); });
-    panneau.classList.add('ouvert');
-  }
+  // Recherche d'un lieu (Nominatim, a la demande seulement).
+  $('recherche').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var q = $('lieu').value.trim();
+    if (!q) return;
+    $('etat').classList.add('charge');
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=fr&q=' + encodeURIComponent(q))
+      .then(function (r) { return r.json(); })
+      .then(function (l) {
+        if (!l.length) { toast('Lieu introuvable'); return; }
+        carte.setView([+l[0].lat, +l[0].lon], 18);
+      })
+      .catch(function () { toast('Recherche indisponible'); })
+      .finally(function () { $('etat').classList.remove('charge'); });
+  });
 
-  document.getElementById('fermer').addEventListener('click', function () { panneau.classList.remove('ouvert'); });
+  $('position').addEventListener('click', function () {
+    if (!navigator.geolocation) { toast('Localisation indisponible'); return; }
+    navigator.geolocation.getCurrentPosition(function (p) { carte.setView([p.coords.latitude, p.coords.longitude], 18); },
+      function () { toast('Localisation refusée'); }, { enableHighAccuracy: true, timeout: 10000 });
+  });
+  $('zoomer-ici').addEventListener('click', function () { carte.setZoom(Math.max(ZOOM_MIN + 2, carte.getZoom() + 4)); });
+  $('fermer').addEventListener('click', fermer);
+  document.addEventListener('keydown', function (e) {
+    if (e.target && /input|textarea/i.test(e.target.tagName)) return;
+    if (e.key === 'Escape') fermer();
+    if (courante && e.key === 'ArrowLeft') voisine('prev');
+    if (courante && e.key === 'ArrowRight') voisine('next');
+  });
   carte.on('moveend', chercher);
-  chercher();
+  charger();
 })();
 </script>
 </body>
